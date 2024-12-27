@@ -7,9 +7,11 @@ url: https://github.com/nott-smartbed/hassio-addons.git
 uart: true
 hassio_api: true
 homeassistant_api: true
+startup: "application"
+boot: "auto"
 options:
   hassio_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIzNDZhNzUzMThmYTg0YjYxOGJiYmJlNDU5OWZlNGMyZiIsImlhdCI6MTczNTI4NDk3MiwiZXhwIjoyMDUwNjQ0OTcyfQ.4hJb_uC6jnUzGvKODSKZEXHWEqs3D6Yivp9Vx2POIiM
-  serial_port: /dev/tty.usbserial-0001
+  serial_port: /dev/ttyS4
   baud_rate: 115200
 schema:
   log_level: list(trace|debug|info|notice|warning|error|fatal)?
@@ -17,4 +19,4 @@ schema:
   serial_port: str
   baud_rate: int
 devices:
-  - /dev/tty.usbserial-0001
+  - "/dev/ttyS4:/dev/ttyS4:rwm"
