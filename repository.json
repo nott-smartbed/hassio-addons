@@ -1,0 +1,6 @@
+{
+    "name": "CHTLAB SmartBed Add-ons",
+    "udev": true,
+    "url": "https://github.com/chtlab/hassio-addons",
+    "maintainer": "CHTLAB"
+  }
