@@ -4,11 +4,10 @@ version: 1.0.0
 slug: sleep_pad_monitor
 description: Sleep Pad Monitor
 url: https://github.com/nott-smartbed/hassio-addons.git
-uart: true
-hassio_api: true
-homeassistant_api: true
-startup: "application"
-boot: "auto"
+startup: application
+boot: manual
+devices:
+  - "/dev/ttyS4:/dev/ttyS4:rwm"
 options:
   hassio_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIzNDZhNzUzMThmYTg0YjYxOGJiYmJlNDU5OWZlNGMyZiIsImlhdCI6MTczNTI4NDk3MiwiZXhwIjoyMDUwNjQ0OTcyfQ.4hJb_uC6jnUzGvKODSKZEXHWEqs3D6Yivp9Vx2POIiM
   serial_port: /dev/ttyS4
@@ -18,5 +17,3 @@ schema:
   hassio_token: str
   serial_port: str
   baud_rate: int
-devices:
-  - "/dev/ttyS4:/dev/ttyS4:rwm"
