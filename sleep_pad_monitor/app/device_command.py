@@ -1,4 +1,4 @@
-import src.helper as Helper
+import helper as Helper
 
 def read_command_content_0x80(content):
     # Prompt the server important information, the content of which is an ASCII string.
@@ -506,8 +506,8 @@ def read_client_command(command):
     handler = command_handlers.get(frame_type)
     if handler:
         data = handler(content)
-        print(f"ID: {id}, Frame Type: {frame_type}, Content: {data}")
-        # send data to server
-        
+        if data:
+            print(f"ID: {id}, Frame Type: {frame_type}, Data: {data}")
+            # send data to server
     else:
         print(f"Unknown command: {command}")

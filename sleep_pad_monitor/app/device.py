@@ -1,7 +1,7 @@
 import time
 import os
 import serial
-import src.device_command as DeviceCommand
+import device_command as DeviceCommand
 
 # UART Configuration
 UART_PORT = os.getenv('UART_PORT', "/dev/tty.usbserial-0001")  # Replace with the actual port of your device

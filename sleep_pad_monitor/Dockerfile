@@ -1,13 +1,22 @@
-FROM python:3.10-slim
+# Base image compatible with Python 3.9 and Home Assistant addons
+ARG BUILD_FROM=ghcr.io/home-assistant/amd64-base-python:3.13-alpine3.21
+FROM ${BUILD_FROM}
 
-# Cài đặt các thư viện Python cần thiết
-RUN pip install --no-cache-dir \
-    requests
-RUN pip install pyserial
+# Set the working directory inside the container
+WORKDIR /app
 
-# Sao chép mã ứng dụng vào container
-COPY main.py /main.py
-COPY src /src
-#COPY options.json /data/options.json
-# Chạy script Python
-CMD ["python", "/run.py"]
+# Copy the addon files into the container
+COPY app/ /app/
+COPY requirements.txt /app/requirements.txt
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r /app/requirements.txt
+
+# Set permissions for the app directory
+RUN chmod +x /app/device.py
+
+# Ensure serial devices are accessible
+ENV UDEV=1
+
+# Entrypoint to start the addon
+CMD [ "python", "/app/device.py" ]

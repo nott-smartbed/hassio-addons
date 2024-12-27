@@ -1,7 +1,7 @@
 import serial
 import os
-import src.helper as Helper
-import src.server_command as ServerCommand
+import helper as Helper
+import server_command as ServerCommand
 
 # UART Configuration
 UART_PORT = os.getenv('UART_PORT', "/dev/tty.usbserial-0001")  # Replace with the actual port of your device
