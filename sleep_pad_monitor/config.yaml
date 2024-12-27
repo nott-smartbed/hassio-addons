@@ -1,11 +1,9 @@
 ---
 name: Sleep Pad Monitor
-version: 1.0.0
-slug: sleep_pad_monitor
-description: Sleep Pad Monitor
-url: https://github.com/nott-smartbed/hassio-addons.git
+version: dev
+slug: chtlab-sleeppad
 startup: application
-boot: manual
+boot: auto
 devices:
   - "/dev/ttyS4:/dev/ttyS4:rwm"
 options:
