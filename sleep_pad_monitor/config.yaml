@@ -1,17 +1,23 @@
 ---
-name: Sleep Pad Monitor
-version: dev
-slug: chtlab-sleeppad
-startup: application
-boot: auto
+name: "Sleep Pad"
+version: "1.0"
+slug: "chtlab_sleep_pad"
+description: "Sleep Pad Monitor"
+startup: "application"
+boot: "auto"
+arch:
+  - armhf
+  - armv7
+  - aarch64
+  - amd64
+  - i386
+options:
+  API_TOKEN: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIzNDZhNzUzMThmYTg0YjYxOGJiYmJlNDU5OWZlNGMyZiIsImlhdCI6MTczNTI4NDk3MiwiZXhwIjoyMDUwNjQ0OTcyfQ.4hJb_uC6jnUzGvKODSKZEXHWEqs3D6Yivp9Vx2POIiM
+  UART_PORT: "/dev/ttyS4"
+  BAUD_RATE: 115200
+schema:
+  API_TOKEN: str
+  UART_PORT: str
+  BAUD_RATE: int
 devices:
   - "/dev/ttyS4:/dev/ttyS4:rwm"
-options:
-  hassio_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIzNDZhNzUzMThmYTg0YjYxOGJiYmJlNDU5OWZlNGMyZiIsImlhdCI6MTczNTI4NDk3MiwiZXhwIjoyMDUwNjQ0OTcyfQ.4hJb_uC6jnUzGvKODSKZEXHWEqs3D6Yivp9Vx2POIiM
-  serial_port: /dev/ttyS4
-  baud_rate: 115200
-schema:
-  log_level: list(trace|debug|info|notice|warning|error|fatal)?
-  hassio_token: str
-  serial_port: str
-  baud_rate: int

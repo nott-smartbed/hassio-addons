@@ -4,7 +4,7 @@ import serial
 import device_command as DeviceCommand
 
 # UART Configuration
-UART_PORT = os.getenv('UART_PORT', "/dev/tty.usbserial-0001")  # Replace with the actual port of your device
+UART_PORT = os.getenv('UART_PORT', "/dev/ttyS4")  # Replace with the actual port of your device
 BAUD_RATE = os.getenv('BAUD_RATE', 115200)
 
 def read_uart_data():
