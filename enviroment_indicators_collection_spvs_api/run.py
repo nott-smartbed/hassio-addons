@@ -35,7 +35,7 @@ class SensorManager:
             self.bmp180 = BMP085(busnum=5)  # BMP180
 
         if self.options.get("bmp280", False):
-            self.bmp280 = BMP280(i2c_addr=0x77, i2c_dev=self.bus)
+            self.bmp280 = BMP280(i2c_addr=0x76, i2c_dev=self.bus)
             self.bmp280.setup(
                 mode="normal",
                 temperature_oversampling=16,
