@@ -12,7 +12,6 @@ from library.SHT4x import SHT4x
 
 class SensorManager:
     def __init__(self, options_path="/data/options.json"):
-        print("Starting SensorManager...")
         # Đọc các tùy chọn từ file options.json
         self.options = self.load_options(options_path)
 
@@ -136,64 +135,65 @@ class SensorManager:
 
     def run(self):
         while True:
-            # Đọc và gửi dữ liệu từ BMP180
-            if self.options.get("bmp180", False):
-                try:
-                    pressure = self.bmp180.read_pressure()
-                    self.post_to_home_assistant("bmp180_pressure", round(pressure / 100, 2), "hPa", "BMP180 Pressure")
-                    altitude = self.calculate_altitude(pressure)
-                    self.post_to_home_assistant("bmp180_altitude", round(altitude, 2), "m", "BMP180 Altitude")
-                except Exception as e:
-                    print(f"Error reading BMP180: {e}")
+            print("Collecting data...")
+            # # Đọc và gửi dữ liệu từ BMP180
+            # if self.options.get("bmp180", False):
+            #     try:
+            #         pressure = self.bmp180.read_pressure()
+            #         self.post_to_home_assistant("bmp180_pressure", round(pressure / 100, 2), "hPa", "BMP180 Pressure")
+            #         altitude = self.calculate_altitude(pressure)
+            #         self.post_to_home_assistant("bmp180_altitude", round(altitude, 2), "m", "BMP180 Altitude")
+            #     except Exception as e:
+            #         print(f"Error reading BMP180: {e}")
 
-            # Đọc và gửi dữ liệu từ BMP280
-            if self.options.get("bmp280", False):
-                try:
-                    temperature = self.bmp280.get_temperature()
-                    pressure = self.bmp280.get_pressure()
-                    self.post_to_home_assistant("bmp280_temperature", round(temperature, 2), "°C", "BMP280 Temperature")
-                    self.post_to_home_assistant("bmp280_pressure", round(pressure, 2), "hPa", "BMP280 Pressure")
-                    altitude = self.calculate_altitude(pressure)
-                    self.post_to_home_assistant("bmp280_altitude", round(altitude, 2), "m", "BMP280 Altitude")
-                except Exception as e:
-                    print(f"Error reading BMP280: {e}")
+            # # Đọc và gửi dữ liệu từ BMP280
+            # if self.options.get("bmp280", False):
+            #     try:
+            #         temperature = self.bmp280.get_temperature()
+            #         pressure = self.bmp280.get_pressure()
+            #         self.post_to_home_assistant("bmp280_temperature", round(temperature, 2), "°C", "BMP280 Temperature")
+            #         self.post_to_home_assistant("bmp280_pressure", round(pressure, 2), "hPa", "BMP280 Pressure")
+            #         altitude = self.calculate_altitude(pressure)
+            #         self.post_to_home_assistant("bmp280_altitude", round(altitude, 2), "m", "BMP280 Altitude")
+            #     except Exception as e:
+            #         print(f"Error reading BMP280: {e}")
 
-            # Đọc và gửi dữ liệu từ SHT31
-            if self.options.get("sht31", False):
-                try:
-                    temperature, humidity = self.read_sht31()
-                    if temperature is not None and humidity is not None:
-                        self.post_to_home_assistant("sht31_temperature", round(temperature, 2), "°C", "SHT31 Temperature")
-                        self.post_to_home_assistant("sht31_humidity", round(humidity, 2), "%", "SHT31 Humidity")
-                        absolute_humidity = self.calculate_absolute_humidity(temperature, humidity)
-                        self.post_to_home_assistant("sht31_absolute_humidity", round(absolute_humidity, 2), "g/m³", "SHT31 Absolute Humidity")
-                        dew_point = self.calculate_dew_point(temperature, humidity)
-                        self.post_to_home_assistant("sht31_dew_point", round(dew_point, 2), "°C", "SHT31 Dew Point")
-                except Exception as e:
-                    print(f"Error reading SHT31: {e}")
+            # # Đọc và gửi dữ liệu từ SHT31
+            # if self.options.get("sht31", False):
+            #     try:
+            #         temperature, humidity = self.read_sht31()
+            #         if temperature is not None and humidity is not None:
+            #             self.post_to_home_assistant("sht31_temperature", round(temperature, 2), "°C", "SHT31 Temperature")
+            #             self.post_to_home_assistant("sht31_humidity", round(humidity, 2), "%", "SHT31 Humidity")
+            #             absolute_humidity = self.calculate_absolute_humidity(temperature, humidity)
+            #             self.post_to_home_assistant("sht31_absolute_humidity", round(absolute_humidity, 2), "g/m³", "SHT31 Absolute Humidity")
+            #             dew_point = self.calculate_dew_point(temperature, humidity)
+            #             self.post_to_home_assistant("sht31_dew_point", round(dew_point, 2), "°C", "SHT31 Dew Point")
+            #     except Exception as e:
+            #         print(f"Error reading SHT31: {e}")
 
-            # Đọc và gửi dữ liệu từ SHT45
-            if self.options.get("sht45", False):
-                try:
-                    temperature, humidity = self.read_sht45()
-                    if temperature is not None and humidity is not None:
-                        self.post_to_home_assistant("sht45_temperature", round(temperature, 2), "°C", "SHT45 Temperature")
-                        self.post_to_home_assistant("sht45_humidity", round(humidity, 2), "%", "SHT45 Humidity")
-                        absolute_humidity = self.calculate_absolute_humidity(temperature, humidity)
-                        self.post_to_home_assistant("sht45_absolute_humidity", round(absolute_humidity, 2), "g/m³", "SHT45 Absolute Humidity")
-                        dew_point = self.calculate_dew_point(temperature, humidity)
-                        self.post_to_home_assistant("sht45_dew_point", round(dew_point, 2), "°C", "SHT45 Dew Point")
-                except Exception as e:
-                    print(f"Error reading SHT45: {e}")
+            # # Đọc và gửi dữ liệu từ SHT45
+            # if self.options.get("sht45", False):
+            #     try:
+            #         temperature, humidity = self.read_sht45()
+            #         if temperature is not None and humidity is not None:
+            #             self.post_to_home_assistant("sht45_temperature", round(temperature, 2), "°C", "SHT45 Temperature")
+            #             self.post_to_home_assistant("sht45_humidity", round(humidity, 2), "%", "SHT45 Humidity")
+            #             absolute_humidity = self.calculate_absolute_humidity(temperature, humidity)
+            #             self.post_to_home_assistant("sht45_absolute_humidity", round(absolute_humidity, 2), "g/m³", "SHT45 Absolute Humidity")
+            #             dew_point = self.calculate_dew_point(temperature, humidity)
+            #             self.post_to_home_assistant("sht45_dew_point", round(dew_point, 2), "°C", "SHT45 Dew Point")
+            #     except Exception as e:
+            #         print(f"Error reading SHT45: {e}")
 
-            # Đọc và gửi dữ liệu từ cảm biến Oxy
-            if self.options.get("oxygen", False):
-                try:
-                    oxygen_concentration = self.read_oxygen()
-                    if oxygen_concentration is not None:
-                        self.post_to_home_assistant("oxygen_concentration", round(oxygen_concentration, 2), "%", "Oxygen Concentration")
-                except Exception as e:
-                    print(f"Error reading Oxygen sensor: {e}")
+            # # Đọc và gửi dữ liệu từ cảm biến Oxy
+            # if self.options.get("oxygen", False):
+            #     try:
+            #         oxygen_concentration = self.read_oxygen()
+            #         if oxygen_concentration is not None:
+            #             self.post_to_home_assistant("oxygen_concentration", round(oxygen_concentration, 2), "%", "Oxygen Concentration")
+            #     except Exception as e:
+            #         print(f"Error reading Oxygen sensor: {e}")
 
             time.sleep(10)
 
