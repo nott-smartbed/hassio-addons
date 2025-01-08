@@ -1,4 +1,4 @@
-name: enviroment_sensors_lltoken_api
+name: enviroment_token
 version: dev
 slug: enviroment
 description: "this is an addon to collect indicator of enviroment"
