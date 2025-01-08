@@ -30,7 +30,7 @@ class SensorManager:
         if self.options.get("bmp180", False):
             self.bmp180 = BMP085(busnum=5)  # BMP180
         if self.options.get("bmp280", False):  # Thêm BMP280
-            self.bmp280 = BMP280(i2c_addr=0x76, i2c_dev=self.bus)  # Khởi tạo BMP280 với địa chỉ I2C 0x76
+            self.bmp280 = BMP280(i2c_addr=0x77, i2c_dev=self.bus)  # Khởi tạo BMP280 với địa chỉ I2C 0x76
             self.bmp280.setup(
                 mode="normal",                   # Chế độ hoạt động: normal, sleep, forced
                 temperature_oversampling=16,     # Hệ số lấy mẫu nhiệt độ
