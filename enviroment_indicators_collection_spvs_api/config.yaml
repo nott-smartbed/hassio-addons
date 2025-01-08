@@ -1,6 +1,6 @@
 name: enviroment_sensors_spvs_api
 version: dev
-slug: enviroment_sensors
+slug: spvs_sensor
 description: "This addon is to collect indicators of enviroment"
 arch:
   - aarch64
