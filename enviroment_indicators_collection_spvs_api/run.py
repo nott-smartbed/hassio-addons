@@ -12,6 +12,7 @@ from library.SHT4x import SHT4x
 
 class SensorManager:
     def __init__(self, options_path="/data/options.json"):
+        print("Starting SensorManager...")
         # Đọc các tùy chọn từ file options.json
         self.options = self.load_options(options_path)
 
