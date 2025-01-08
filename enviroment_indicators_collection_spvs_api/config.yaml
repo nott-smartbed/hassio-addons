@@ -1,4 +1,4 @@
-name: enviroment_sensors
+name: enviroment_sensors_spvs_api
 version: dev
 slug: enviroment_sensors
 description: "This addon is to collect indicators of enviroment"
