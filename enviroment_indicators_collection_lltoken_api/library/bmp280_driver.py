@@ -156,7 +156,7 @@ class BMP280:
             if chip.id not in [BMP280_CHIP_ID, BME280_CHIP_ID]:
                 raise RuntimeError(f"Unable to find BMP280/BME280 on 0x{self._i2c_addr:02x}, CHIP_ID returned {chip.id:02x}")
         except IOError:
-            raise RuntimeError(f"Unable to find BMP280/BME280 on 0x{self._i2c_addr:02x}, IOError")
+            raise RuntimeError(f"Unable to find abc on 0x{self._i2c_addr:02x}, IOError")
 
         self._bmp280.set("CTRL_MEAS", mode=mode, osrs_t=temperature_oversampling, osrs_p=pressure_oversampling)
         self._bmp280.set("CONFIG", t_sb=temperature_standby, filter=2)
