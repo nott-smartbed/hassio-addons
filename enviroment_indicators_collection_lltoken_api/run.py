@@ -33,7 +33,7 @@ class SensorManager:
             self.bmp280 = BMP280(i2c_addr=0x77, i2c_dev=self.bus)  # Khởi tạo BMP280 với địa chỉ I2C 0x76
             self.bmp280.setup(
                 mode="normal",                   # Chế độ hoạt động: normal, sleep, forced
-                temperature_oversampling=16,     # Hệ số lấy mẫu nhiệt độ
+                temperature_oversampling=16,    # Hệ số lấy mẫu nhiệt độ
                 pressure_oversampling=16,        # Hệ số lấy mẫu áp suất
                 temperature_standby=500          # Thời gian chờ giữa các phép đo (ms)
             )
@@ -48,6 +48,7 @@ class SensorManager:
     def load_options(self, file_path):
         try:
             with open(file_path, "r") as file:
+                print(file)
                 return json.load(file)
         except (FileNotFoundError, json.JSONDecodeError) as e:
             print(f"Error loading options: {e}")
