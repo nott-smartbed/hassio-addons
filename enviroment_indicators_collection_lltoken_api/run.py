@@ -9,34 +9,26 @@ from library.SHT4x import SHT4x  # Import thư viện SHT4x
 
 class SensorManager:
     def __init__(self, options_path="/data/options.json"):
-        # Đọc các tùy chọn từ file options.json
-        self.options = self.load_options(options_path)
-
-        # Lấy thông tin cấu hình của Home Assistant
-        self.ha_base_url = self.options.get("base_url", "http://default-url")
-        self.ha_token = self.options.get("token", "default-token")
-        self.validate_config()
-
-        # Khởi tạo headers cho việc gửi dữ liệu lên Home Assistant
         self.headers = {
             "Authorization": f"Bearer {self.ha_token}",
             "Content-Type": "application/json",
         }
-
-        # Khởi tạo bus I2C
-        self.bus = SMBus(5)  # Điều chỉnh bus I2C nếu cần thiết
-
-        # Khởi tạo các cảm biến nếu chúng được bật trong cấu hình
+        self.bus = SMBus(5)
+        self.ha_base_url = self.options.get("base_url", "http://default-url")
+        self.ha_token = self.options.get("token", "default-token")
+        self.options = self.load_options(options_path)
+        print(self.options)
+        self.validate_config()
         if self.options.get("bmp180", False):
-            self.bmp180 = BMP085(busnum=5)  # BMP180
-        if self.options.get("bmp280", False):  # Thêm BMP280
-            # self.bmp280 = BMP280(i2c_addr=0x77, i2c_dev=self.bus)  # Khởi tạo BMP280 với địa chỉ I2C 0x76
-            # self.bmp280.setup(
-            #     mode="normal",                   # Chế độ hoạt động: normal, sleep, forced
-            #     temperature_oversampling=16,    # Hệ số lấy mẫu nhiệt độ
-            #     pressure_oversampling=16,        # Hệ số lấy mẫu áp suất
-            #     temperature_standby=500          # Thời gian chờ giữa các phép đo (ms)
-            # )
+            self.bmp180 = BMP085(busnum=5)
+        if self.options.get("bmp280", False):
+            self.bmp280 = BMP280(i2c_addr=0x77, i2c_dev=self.bus)  # Khởi tạo BMP280 với địa chỉ I2C 0x76
+            self.bmp280.setup(
+                mode="normal",                   # Chế độ hoạt động: normal, sleep, forced
+                temperature_oversampling=16,    # Hệ số lấy mẫu nhiệt độ
+                pressure_oversampling=16,        # Hệ số lấy mẫu áp suất
+                temperature_standby=500          # Thời gian chờ giữa các phép đo (ms)
+            )
             print("init BMP280 success")
         if self.options.get("oxygen", False):
             self.oxygen_sensor = DFRobot_Oxygen_IIC(5, int(self.options.get("addr-oxy", "0x73"), 16))
