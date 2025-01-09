@@ -1,6 +1,7 @@
 import time
 import json
 import requests
+import logging
 from library.bmp280_driver import BMP280  # Thay thế thư viện cũ bằng bmp280_driver
 from smbus2 import SMBus
 from Adafruit_BMP.BMP085 import BMP085  # BMP180
@@ -256,6 +257,8 @@ class SensorManager:
             time.sleep(10)
 
 if __name__ == "__main__":
+    print("Starting sensor manager...")
+    logging.info("[LOGGER] Starting sensor manager...")
     sensor_manager = SensorManager()
     sensor_manager.run()
 
