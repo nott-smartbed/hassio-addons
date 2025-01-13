@@ -101,7 +101,7 @@ class SensorManager:
     def post_to_home_assistant(self, url, payload):
         try:
             print(url, payload)
-            response = requests.post(url, json=payload, headers=self.headers)
+            response = requests.post(url, json=json.dumps(payload), headers=self.headers)
             response.raise_for_status()  # Kích hoạt ngoại lệ nếu có lỗi HTTP
             print(f"Data posted to {url}: {payload}")
         except requests.exceptions.RequestException as e:
