@@ -1,5 +1,5 @@
 name: long_lived_token_sensor
-version: dev 1.1.1
+version: dev1.1.1
 slug: long_lived_token_sensor
 description: "this add on using long lived token for authentication"
 arch:
