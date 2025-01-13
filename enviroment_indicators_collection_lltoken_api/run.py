@@ -113,8 +113,8 @@ class SensorManager:
                     "payload": {
                         "state": round(value, constant.ROUND_VALUE),
                         "attributes": {
-                            "unit_of_measurement": {unit},
-                            "friendly_name": {friendly_name},
+                            "unit_of_measurement": unit,
+                            "friendly_name": friendly_name,
                         },
                     },
                 }
