@@ -1,7 +1,7 @@
 import time
 import json
 import requests
-import constant
+import library.constant as constant
 from library.bmp280_driver import BMP280  # Thay thế thư viện cũ bằng bmp280_driver
 from smbus2 import SMBus
 from Adafruit_BMP.BMP085 import BMP085  # BMP180
