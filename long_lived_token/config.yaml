@@ -17,9 +17,9 @@ options:
   addr-bmp: none
   addr-sht: none
   addr-oxy: none
-  base_url: http://192.168.31.18:8123/api/states
+  base_url:
     required: true
-  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJkNGU2NDc0ZWM2ODU0OThlYmE1ZTIzYTMxOWUzMDY2MCIsImlhdCI6MTczNjMwNjI4MSwiZXhwIjoyMDUxNjY2MjgxfQ.BjyBI6G40FnMKlOMPIVN10rRnt4B3lseJj6-BDOCYOA
+  token:
     required: true
   ssl: false
   bmp180: false
