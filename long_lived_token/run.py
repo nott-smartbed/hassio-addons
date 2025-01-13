@@ -7,11 +7,23 @@ from Adafruit_BMP.BMP085 import BMP085  # BMP180
 from library.DFRobot_Oxygen import DFRobot_Oxygen_IIC
 from library.SHT4x import SHT4x  # Import thư viện SHT4x
 
+options = {
+    "base_url": "http://192.168.31.18:8123/api/states",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJkNGU2NDc0ZWM2ODU0OThlYmE1ZTIzYTMxOWUzMDY2MCIsImlhdCI6MTczNjMwNjI4MSwiZXhwIjoyMDUxNjY2MjgxfQ.BjyBI6G40FnMKlOMPIVN10rRnt4B3lseJj6-BDOCYOA",
+    "bmp180": True,
+    "bmp280": False,
+    "oxygen": False,
+    "sht31": False,
+    "sht45": False,
+    "addr-oxy": "0x73",
+    "addr-sht": "0x44"
+}
+
 class SensorManager:
     def __init__(self, options_path="/data/options.json"):
         # Đọc các tùy chọn từ file options.json
-        self.options = self.load_options(options_path)
-
+        # self.options = self.load_options(options_path)
+        self.options = options
         # Lấy thông tin cấu hình của Home Assistant
         self.ha_base_url = self.options.get("base_url", "http://default-url")
         self.ha_token = self.options.get("token", "default-token")

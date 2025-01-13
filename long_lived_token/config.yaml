@@ -1,7 +1,7 @@
-name: enviroment_sensors
+name: long_lived_token_sensor
 version: dev
-slug: enviroment
-description: "this is an addon to collect indicator of enviroment"
+slug: long_lived_token_sensor
+description: "this add on using long lived token for authentication"
 arch:
   - aarch64
   - amd64
