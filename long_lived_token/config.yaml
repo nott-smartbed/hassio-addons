@@ -1,5 +1,5 @@
 name: long_lived_token_sensor
-version: dev
+version: 1.1.1
 slug: long_lived_token_sensor
 description: "this add on using long lived token for authentication"
 arch:
@@ -17,9 +17,9 @@ options:
   addr-bmp: none
   addr-sht: none
   addr-oxy: none
-  base_url:
+  base_url: http://192.168.31.18:8123/api/states
     required: true
-  token:
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJkNGU2NDc0ZWM2ODU0OThlYmE1ZTIzYTMxOWUzMDY2MCIsImlhdCI6MTczNjMwNjI4MSwiZXhwIjoyMDUxNjY2MjgxfQ.BjyBI6G40FnMKlOMPIVN10rRnt4B3lseJj6-BDOCYOA
     required: true
   ssl: false
   bmp180: false
