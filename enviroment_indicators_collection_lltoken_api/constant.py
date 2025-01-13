@@ -1,0 +1,25 @@
+DEFAULT_BUS = 5
+
+BMP180_OPTION = 'bmp180'
+
+OXYGEN_SENSOR_ADDRESS = 'addr-oxy'
+OXYGEN_OPTION = 'oxygen'
+OXYGEN_DEFAULT_PIN = "0x73"
+OXYGEN_SENSOR_NAME = "Oxygen_concentration"
+OXYGEN_FIENDLY_NAME = "Oxygen"
+
+SHT31_SENSOR_ADDRESS = 'addr-sht'
+SHT31_OPTION = 'sht31'
+SHT31_DEFAULT_PIN = "0x44"
+
+SHT45_SENSOR_ADDRESS = 'addr-sht'
+SHT45_OPTION = 'sht45'
+SHT45_DEFAULT_PIN = 0x44
+SHT45_DEFAULT_MODE = 'high'
+SHT45_SENSOR_NAME = "sht45_temperature"
+SHT45_FIENDLY_NAME = "Temperature"
+
+DEFAULT_BASE_URL = "http://default-url"
+DEFAULT_TOKEN = "default-token"
+
+ROUND_VALUE = 2
