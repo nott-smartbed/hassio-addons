@@ -11,23 +11,10 @@ from library.SHT4x import SHT4x
 import library.constants as Constants
 from library.utils import Utils
 
-options ={
-  "addr-bmp": "0x77",
-  "addr-sht": "0x44",
-  "addr-oxy": "0x73",
-  "base_url": "http://192.168.137.140:8123/api/states",
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIyZjczNDAwNzNiOGI0NDlkOTUwMzllN2UwMDk0ZWIzYyIsImlhdCI6MTczMzg4MjQ0MiwiZXhwIjoyMDQ5MjQyNDQyfQ.bKSPlvdistjWsx92MBQFIvXnrawdriIVskwJdWd5iBo",
-  "bmp180": True,
-  "bmp280": False,
-  "sht31": True,
-  "sht45": False,
-  "oxygen": True
-}
-
 
 class SensorManager:
     def __init__(self, options_path="/data/options.json"):
-        self.options = options
+        self.options = self.load_options(options_path)
         self.ha_base_url = "http://supervisor/core/api"
         self.ha_token = os.getenv("SUPERVISOR_TOKEN")
         self.utils = Utils()
