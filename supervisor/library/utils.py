@@ -21,7 +21,7 @@ class Utils:
         dew_point = (Constants.TEMP_EXPONENTIAL_DENOMINATOR * gamma) / (Constants.TEMP_EXPONENTIAL_NUMERATOR - gamma)
         return dew_point
     
-    def process_sht31_data(data):
+    def process_sht31_data(self, data):
             temp_raw = (data[0] << 8) + data[1]
             humidity_raw = (data[3] << 8) + data[4]
             temperature = -45 + (175 * temp_raw / 65535.0)

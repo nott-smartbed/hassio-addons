@@ -12,9 +12,23 @@ import library.constants as Constants
 from library.utils import Utils
 
 
+options = {
+  "addr-bmp": "0x77",
+  "addr-sht": "0x44",
+  "addr-oxy": "0x73",
+  "base_url": "http://192.168.137.140:8123/api/states",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIyZjczNDAwNzNiOGI0NDlkOTUwMzllN2UwMDk0ZWIzYyIsImlhdCI6MTczMzg4MjQ0MiwiZXhwIjoyMDQ5MjQyNDQyfQ.bKSPlvdistjWsx92MBQFIvXnrawdriIVskwJdWd5iBo",
+  "bmp180": False,
+  "bmp280": False,
+  "sht31": True,
+  "sht45": False,
+  "oxygen": False
+}
+
+
 class SensorManager:
     def __init__(self, options_path="/data/options.json"):
-        self.options = self.load_options(options_path)
+        self.options = options
         self.ha_base_url = "http://supervisor/core/api"
         self.ha_token = os.getenv("SUPERVISOR_TOKEN")
         self.utils = Utils()
@@ -84,10 +98,7 @@ class SensorManager:
             self.bus.write_i2c_block_data(self.sht31_address, self.read_temp_hum_cmd[0], self.read_temp_hum_cmd[1:])
             time.sleep(0.5)
             data = self.bus.read_i2c_block_data(self.sht31_address, 0x00, 6)
-            temp_raw = (data[0] << 8) + data[1]
-            humidity_raw = (data[3] << 8) + data[4]
-            temperature = -45 + (175 * temp_raw / 65535.0)
-            humidity = (100 * humidity_raw / 65535.0)
+            temperature, humidity = self.utils.process_sht31_data(data)
             return temperature, humidity
         except Exception as e:
             print(f"Error reading from SHT31: {e}")
@@ -176,7 +187,7 @@ class SensorManager:
                         self.post_to_home_assistant("oxygen_concentration", round(oxygen_concentration, 2), "%", "Oxygen Concentration")
                 except Exception as e:
                     print(f"Error reading Oxygen sensor: {e}")
-            time.sleep(1)
+            time.sleep(10)
 
 
 if __name__ == "__main__":
