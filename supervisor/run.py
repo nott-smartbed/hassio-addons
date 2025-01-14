@@ -28,7 +28,7 @@ class SensorManager:
             self.bmp180 = BMP085(busnum=Constants.DEFAULT_BUS)
 
         if self.options.get(Constants.BMP280, False):
-            self.bmp280 = BMP280(i2c_addr=Constants.DEFAULT_BMP280_SENSOR_ADDRESS, i2c_dev=self.bus)
+            self.bmp280 = BMP280(i2c_addr=Constants.DEFAULT_BMP280_SENSOR_ADDRESS, i2c_dev=Constants.DEFAULT_BUS)
             self.bmp280.setup(
                 mode=Constants.NORMAL,
                 temperature_oversampling=16,
@@ -37,7 +37,7 @@ class SensorManager:
             )
 
         if self.options.get(Constants.OXYGEN, False):
-            self.oxygen_sensor = DFRobot_Oxygen_IIC(self.bus, Constants.DEFAULT_OXYGEN_SENSOR_ADDRESS)
+            self.oxygen_sensor = DFRobot_Oxygen_IIC(Constants.DEFAULT_BUS, Constants.DEFAULT_OXYGEN_SENSOR_ADDRESS)
 
         if self.options.get(Constants.SHT31, False):
             self.sht31_address = Constants.DEFAULT_SHT31_SENSOR_ADDRESS
