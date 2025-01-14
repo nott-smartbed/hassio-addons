@@ -11,6 +11,7 @@ from library.SHT4x import SHT4x
 import library.constants as Constants
 from library.utils import Utils
 
+
 class SensorManager:
     def __init__(self, options_path="/data/options.json"):
         self.options = self.load_options(options_path)
@@ -28,7 +29,7 @@ class SensorManager:
             self.bmp180 = BMP085(busnum=Constants.DEFAULT_BUS)
 
         if self.options.get(Constants.BMP280, False):
-            self.bmp280 = BMP280(i2c_addr=Constants.DEFAULT_BMP280_SENSOR_ADDRESS, i2c_dev=Constants.DEFAULT_BUS)
+            self.bmp280 = BMP280(i2c_addr=0x76, i2c_dev=self.bus)
             self.bmp280.setup(
                 mode=Constants.NORMAL,
                 temperature_oversampling=16,
@@ -37,15 +38,16 @@ class SensorManager:
             )
 
         if self.options.get(Constants.OXYGEN, False):
-            self.oxygen_sensor = DFRobot_Oxygen_IIC(Constants.DEFAULT_BUS, Constants.DEFAULT_OXYGEN_SENSOR_ADDRESS)
+            self.oxygen_sensor = DFRobot_Oxygen_IIC(Constants.DEFAULT_BUS, 0x73)
 
         if self.options.get(Constants.SHT31, False):
-            self.sht31_address = Constants.DEFAULT_SHT31_SENSOR_ADDRESS
+            default_sht31_address = hex(Constants.DEFAULT_SHT31_SENSOR_ADDRESS)
+            self.sht31_address = int(self.options.get(Constants.ADDR_SHT, default_sht31_address), 16)
             self.read_temp_hum_cmd = [0x2C, 0x06]
 
         # sht31 and sht45 using the same port
         if self.options.get(Constants.SHT45, False):
-            self.sht45_sensor = SHT4x(bus=Constants.DEFAULT_BUS, address=Constants.DEFAULT_SHT45_SENSOR_ADDRESS, mode=Constants.HIGH)
+            self.sht45_sensor = SHT4x(bus=Constants.DEFAULT_BUS, address=hex(Constants.DEFAULT_SHT45_SENSOR_ADDRESS), mode=Constants.HIGH)
 
     def load_options(self, file_path):
         try:
@@ -78,14 +80,19 @@ class SensorManager:
 
     def read_sht31(self):
         try:
+            print(self.sht31_address, self.read_temp_hum_cmd, self.read_temp_hum_cmd[1:])
             self.bus.write_i2c_block_data(self.sht31_address, self.read_temp_hum_cmd[0], self.read_temp_hum_cmd[1:])
             time.sleep(0.5)
             data = self.bus.read_i2c_block_data(self.sht31_address, 0x00, 6)
-            temperature, humidity = self.utils.process_sht31_data(data)
+            temp_raw = (data[0] << 8) + data[1]
+            humidity_raw = (data[3] << 8) + data[4]
+            temperature = -45 + (175 * temp_raw / 65535.0)
+            humidity = (100 * humidity_raw / 65535.0)
             return temperature, humidity
         except Exception as e:
-            print(f"Error reading SHT31: {e}")
+            print(f"Error reading from SHT31: {e}")
             return None, None
+
 
     def read_sht45(self):
         try:
@@ -110,9 +117,11 @@ class SensorManager:
             if self.options.get(Constants.BMP180, False):
                 try:
                     pressure = self.bmp180.read_pressure()
-                    print(pressure, altitude)
+                    altitude = self.utils.calculate_altitude(pressure)
+                    print(f"BMP180 pressure sensor: {pressure} {Constants.PRESSURE_UNIT}")
+                    print(f"BMP180 altitude sensor: {altitude} {Constants.ALTITUDE_UNIT}")
                     self.post_to_home_assistant(Constants.BMP180_PRESSURE_SENSOR_NAME, round(pressure / 100, 2), Constants.PRESSURE_UNIT, Constants.BMP180_PRESSURE_FIENDLY_NAME)
-                    self.post_to_home_assistant(Constants.BMP180_ALTITUDE_SENSOR_NAME, round(altitude, 2), Constants.HEIGHT_UNIT, Constants.BMP180_ALTITUDE_FIENDLY_NAME)
+                    self.post_to_home_assistant(Constants.BMP180_ALTITUDE_SENSOR_NAME, round(altitude, 2), Constants.ALTITUDE_UNIT, Constants.BMP180_ALTITUDE_FIENDLY_NAME)
                 except Exception as e:
                     print(f"Error reading BMP180: {e}")
 
@@ -121,9 +130,12 @@ class SensorManager:
                     temperature = self.bmp280.get_temperature()
                     pressure = self.bmp280.get_pressure()
                     altitude = self.utils.calculate_altitude(pressure)
+                    print(f"BMP280 temperature sensor: {temperature} {Constants.TEMPERATURE_UNIT}")
+                    print(f"BMP280 pressure sensor: {pressure} {Constants.PRESSURE_UNIT}")
+                    print(f"BMP280 altitude sensor: {altitude} {Constants.ALTITUDE_UNIT}")
                     self.post_to_home_assistant(Constants.BMP280_TEMPERATURE_SENSOR_NAME, round(temperature, 2), Constants.TEMPERATURE_UNIT, Constants.BMP280_TEMPERATURE_FIENDLY_NAME)
                     self.post_to_home_assistant(Constants.BMP280_PRESSURE_SENSOR_NAME, round(pressure, 2), Constants.PRESSURE_UNIT, Constants.BMP280_PRESSURE_FIENDLY_NAME)
-                    self.post_to_home_assistant(Constants.BMP280_ALTITUDE_SENSOR_NAME, round(altitude, 2), Constants.HEIGHT_UNIT, Constants.BMP280_ALTITUDE_FIENDLY_NAME)
+                    self.post_to_home_assistant(Constants.BMP280_ALTITUDE_SENSOR_NAME, round(altitude, 2), Constants.ALTITUDE_UNIT, Constants.BMP280_ALTITUDE_FIENDLY_NAME)
                 except Exception as e:
                     print(f"Error reading BMP280: {e}")
 
@@ -133,6 +145,8 @@ class SensorManager:
                     if temperature is not None and humidity is not None:
                         absolute_humidity = self.utils.calculate_absolute_humidity(temperature, humidity)
                         dew_point = self.utils.calculate_dew_point(temperature, humidity)
+                        print(f"SHT31 absolute humidity: {absolute_humidity} {Constants.ABSOLUTE_HUMIDITY_UNIT}")
+                        print(f"SHT31 dew point : {dew_point} {Constants.TEMPERATURE_UNIT}")
                         self.post_to_home_assistant(Constants.SHT31_TEMPERATURE_SENSOR_NAME, round(temperature, 2), Constants.TEMPERATURE_UNIT, Constants.SHT31_TEMPERATURE_FIENDLY_NAME)
                         self.post_to_home_assistant(Constants.SHT31_HUMIDITY_SENSOR_NAME, round(humidity, 2), Constants.HUMIDITY_UNIT, Constants.SHT31_ABSOLUTE_HUMIDITY_FIENDLY_NAME)
                         self.post_to_home_assistant(Constants.SHT31_ABSOLUTE_HUMIDITY_SENSOR_NAME, round(absolute_humidity, 2), Constants.ABSOLUTE_HUMIDITY_UNIT, Constants.SHT31_ABSOLUTE_HUMIDITY_FIENDLY_NAME)
@@ -146,6 +160,8 @@ class SensorManager:
                     if temperature is not None and humidity is not None:
                         absolute_humidity = self.utils.calculate_absolute_humidity(temperature, humidity)
                         dew_point = self.utils.calculate_dew_point(temperature, humidity)
+                        print(f"SHT45 absolute humidity: {absolute_humidity} {Constants.ABSOLUTE_HUMIDITY_UNIT}")
+                        print(f"SHT45 dew point : {dew_point} {Constants.TEMPERATURE_UNIT}")
                         self.post_to_home_assistant(Constants.SHT45_TEMPERATURE_SENSOR_NAME, round(temperature, 2), Constants.TEMPERATURE_UNIT, Constants.SHT45_TEMPERATURE_FIENDLY_NAME)
                         self.post_to_home_assistant(Constants.SHT45_HUMIDITY_SENSOR_NAME, round(humidity, 2), Constants.HUMIDITY_UNIT, Constants.SHT45_ABSOLUTE_HUMIDITY_FIENDLY_NAME)
                         self.post_to_home_assistant(Constants.SHT45_ABSOLUTE_HUMIDITY_SENSOR_NAME, round(absolute_humidity, 2), Constants.ABSOLUTE_HUMIDITY_UNIT, Constants.SHT45_ABSOLUTE_HUMIDITY_FIENDLY_NAME)
@@ -160,8 +176,7 @@ class SensorManager:
                         self.post_to_home_assistant("oxygen_concentration", round(oxygen_concentration, 2), "%", "Oxygen Concentration")
                 except Exception as e:
                     print(f"Error reading Oxygen sensor: {e}")
-
-            time.sleep(10)
+            time.sleep(1)
 
 
 if __name__ == "__main__":

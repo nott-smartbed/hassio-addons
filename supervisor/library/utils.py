@@ -5,7 +5,7 @@ class Utils:
     def calculate_altitude(self, pressure):
         return Constants.ALTITUDE_SCALING_FACTOR * (1 - (pressure / Constants.SEA_LEVEL_PRESSURE) ** (Constants.PRESSURE_EXPONENT))
 
-    def calculate_absolute_humidity(temperature, relative_humidity):
+    def calculate_absolute_humidity(self, temperature, relative_humidity):
         T = temperature
         RH = relative_humidity / 100.0 # convert % to decimal fraction
         Mw = Constants.MOLAR_MASS_WATER
@@ -14,7 +14,7 @@ class Utils:
         absolute_humidity = (es * RH * Mw) / (R * (T + Constants.C_TO_K_CONVERSION)) * 1000
         return absolute_humidity
 
-    def calculate_dew_point(temperature, relative_humidity):
+    def calculate_dew_point(self, temperature, relative_humidity):
         T = temperature
         RH = relative_humidity
         gamma = math.log(RH / 100.0) + (Constants.TEMP_EXPONENTIAL_NUMERATOR * T) / (T + Constants.TEMP_EXPONENTIAL_DENOMINATOR)
