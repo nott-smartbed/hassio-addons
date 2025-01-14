@@ -4,3 +4,5 @@ sleep_pad_monitor/include/
 sleep_pad_monitor/**/*/__pycache__/
 sleep_pad_monitor/**/*/*.pyc
 sleep_pad_monitor/pyvenv.cfg
+__pycache__
+data

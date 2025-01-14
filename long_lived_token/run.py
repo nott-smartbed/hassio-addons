@@ -6,6 +6,7 @@ from smbus2 import SMBus
 from Adafruit_BMP.BMP085 import BMP085  # BMP180
 from library.DFRobot_Oxygen import DFRobot_Oxygen_IIC
 from library.SHT4x import SHT4x  # Import thư viện SHT4x
+from constants import constants
 
 options = {
     "base_url": "http://192.168.31.18:8123/api/states",
@@ -22,8 +23,8 @@ options = {
 class SensorManager:
     def __init__(self, options_path="/data/options.json"):
         self.options = options
-        self.ha_base_url = self.options.get("base_url", "http://default-url")
-        self.ha_token = self.options.get("token", "default-token")
+        self.ha_base_url = self.options.get(constants.BASE_URL, constants.DEFAULT_BASE_URL)
+        self.ha_token = self.options.get(constants.TOKEN, constants.DEFAULT_TOKEN)
         self.validate_config()
         self.headers = {
             "Authorization": f"Bearer {self.ha_token}",
@@ -31,9 +32,9 @@ class SensorManager:
         }
         self.bus = SMBus(5)
 
-        if self.options.get("bmp180", False):
+        if self.options.get(constants.BMP180, False):
             self.bmp180 = BMP085(busnum=5)
-        if self.options.get("bmp280", False):
+        if self.options.get(constants.BMP280, False):
             self.bmp280 = BMP280(i2c_addr=0x76, i2c_dev=self.bus)
             self.bmp280.setup(
                 mode="normal",          
@@ -41,12 +42,12 @@ class SensorManager:
                 pressure_oversampling=16,
                 temperature_standby=500
             )
-        if self.options.get("oxygen", False):
-            self.oxygen_sensor = DFRobot_Oxygen_IIC(5, int(self.options.get("addr-oxy", "0x73"), 16))
-        if self.options.get("sht31", False):
-            self.sht31_address = int(self.options.get("addr-sht", "0x44"), 16)
+        if self.options.get(constants.OXYGEN, False):
+            self.oxygen_sensor = DFRobot_Oxygen_IIC(5, int(self.options.get(constants.ADDR_OXY, "0x73"), 16))
+        if self.options.get(constants.SHT31, False):
+            self.sht31_address = int(self.options.get(constants.ADDR_SHT, "0x44"), 16)
             self.read_temp_hum_cmd = [0x2C, 0x06]
-        if self.options.get("sht45", False):  # SHT45
+        if self.options.get(constants.SHT45, False):  # SHT45
             self.sht45_sensor = SHT4x(bus=5, address=0x44, mode="high")
 
     def load_options(self, file_path):
@@ -58,7 +59,7 @@ class SensorManager:
             return {}
 
     def validate_config(self):
-        if self.ha_base_url == "http://default-url" or self.ha_token == "default-token":
+        if self.ha_base_url == constants.DEFAULT_BASE_URL or self.ha_token == constants.DEFAULT_TOKEN:
             print("Error: Missing required configuration in options.json.")
             exit(1)
 
@@ -104,141 +105,63 @@ class SensorManager:
         except requests.exceptions.RequestException as e:
             print(f"Error posting to Home Assistant: {e}")
 
+    def generate_header(self, sensor_name, value, unit, friendly_name):
+        return  {
+                "url": f"{self.ha_base_url}/sensor.{sensor_name}",
+                "payload": {
+                    "state": round(value, 2),
+                    "attributes": {
+                        "unit_of_measurement": unit,
+                        "friendly_name": friendly_name,
+                        },
+                    },
+                }
+
     def run(self):
         while True:
             sensor_data = []
 
             if self.options.get("oxygen", False):
                 oxygen_concentration = self.oxygen_sensor.get_oxygen_data(collect_num=20)
-                sensor_data.append(
-                    {
-                        "url": f"{self.ha_base_url}/sensor.Oxygen_concentration",
-                        "payload": {
-                            "state": round(oxygen_concentration, 2),
-                            "attributes": {
-                                "unit_of_measurement": "%",
-                                "friendly_name": "Oxygen",
-                            },
-                        },
-                    }
-                )
+                oxygen_push_data = self.generate_header("Oxygen_concentration", oxygen_concentration, "%", "Oxygen")
+                sensor_data.append(oxygen_push_data)
                 print(f"Oxygen concentration: {oxygen_concentration:.2f}%")
 
             if self.options.get("sht45", False):
                 temperature, humidity = self.read_sht45()
                 if temperature is not None and humidity is not None:
-                    sensor_data.append(
-                        {
-                            "url": f"{self.ha_base_url}/sensor.sht45_temperature",
-                            "payload": {
-                                "state": round(temperature, 2),
-                                "attributes": {
-                                    "unit_of_measurement": "°C",
-                                    "friendly_name": "Temperature",
-                                },
-                            },
-                        }
-                    )
-                    sensor_data.append(
-                        {
-                            "url": f"{self.ha_base_url}/sensor.sht45_humidity",
-                            "payload": {
-                                "state": round(humidity, 2),
-                                "attributes": {
-                                    "unit_of_measurement": "%",
-                                    "friendly_name": "Humidity",
-                                },
-                            },
-                        }
-                    )
+                    temperature_push_data = self.generate_header("sht45_temperature", temperature, "°C", "Temperature")
+                    humidity_push_data = self.generate_header("sht45_humidity", humidity, "%", "Humidity")
+                    sensor_data.append(temperature_push_data)
+                    sensor_data.append(humidity_push_data)
                     print(f"SHT45 Temperature: {temperature:.2f} °C")
                     print(f"SHT45 Humidity: {humidity:.2f} %")
 
             if self.options.get("sht31", False):
                 temperature, humidity = self.read_sht31()
                 if temperature is not None and humidity is not None:
-                    sensor_data.append(
-                        {
-                            "url": f"{self.ha_base_url}/sensor.sht31_temperature",
-                            "payload": {
-                                "state": round(temperature, 2),
-                                "attributes": {
-                                    "unit_of_measurement": "°C",
-                                    "friendly_name": "Temperature",
-                                },
-                            },
-                        }
-                    )
-                    sensor_data.append(
-                        {
-                            "url": f"{self.ha_base_url}/sensor.sht31_humidity",
-                            "payload": {
-                                "state": round(humidity, 2),
-                                "attributes": {
-                                    "unit_of_measurement": "%",
-                                    "friendly_name": "Humidity",
-                                },
-                            },
-                        }
-                    )
+                    temperature_push_data = self.generate_header("sht45_temperature", temperature, "°C", "Temperature")
+                    humidity_push_data = self.generate_header("sht45_humidity", humidity, "%", "Humidity")
+                    sensor_data.append(temperature_push_data)
+                    sensor_data.append(humidity_push_data)
                     print(f"SHT31 Temperature: {temperature:.2f} °C")
                     print(f"SHT31 Humidity: {humidity:.2f} %")
 
             if self.options.get("bmp180", False):
                 pressure = self.bmp180.read_pressure()
-                sensor_data.append(
-                    {
-                        "url": f"{self.ha_base_url}/sensor.bmp180_pressure",
-                        "payload": {
-                            "state": round(pressure / 100, 2),
-                            "attributes": {
-                                "unit_of_measurement": "hPa",
-                                "friendly_name": "BMP180 Pressure",
-                            },
-                        },
-                    }
-                )
+                pressure_push_data = self.generate_header("bmp180_pressure", pressure, "hPa", "Pressure")
+                sensor_data.append(pressure_push_data)
                 print(f"BMP180 Pressure: {pressure / 100:.2f} hPa")
 
             if self.options.get("bmp280", False):
                 temperature, pressure, altitude = self.read_bmp280()
                 if temperature is not None and pressure is not None and altitude is not None:
-                    sensor_data.append(
-                        {
-                            "url": f"{self.ha_base_url}/sensor.bmp280_temperature",
-                            "payload": {
-                                "state": round(temperature, 2),
-                                "attributes": {
-                                    "unit_of_measurement": "°C",
-                                    "friendly_name": "BMP280 Temperature",
-                                },
-                            },
-                        }
-                    )
-                    sensor_data.append(
-                        {
-                            "url": f"{self.ha_base_url}/sensor.bmp280_pressure",
-                            "payload": {
-                                "state": round(pressure, 2),
-                                "attributes": {
-                                    "unit_of_measurement": "hPa",
-                                    "friendly_name": "BMP280 Pressure",
-                                },
-                            },
-                        }
-                    )
-                    sensor_data.append(
-                        {
-                            "url": f"{self.ha_base_url}/sensor.bmp280_altitude",
-                            "payload": {
-                                "state": round(altitude, 2),
-                                "attributes": {
-                                    "unit_of_measurement": "m",
-                                    "friendly_name": "BMP280 Altitude",
-                                },
-                            },
-                        }
-                    )
+                    temperature_push_data = self.generate_header("bmp280_temperature", temperature, "°C", "Temperature")
+                    pressure_push_data = self.generate_header("bmp280_pressure", pressure, "hPa", "Pressure")
+                    altitude_push_data = self.generate_header("bmp280_altitude", altitude, "m", "Altitude")
+                    sensor_data.append(temperature_push_data)
+                    sensor_data.append(pressure_push_data)
+                    sensor_data.append(altitude_push_data)
 
                     print(f"BMP280 Temperature: {temperature:.2f} °C")
                     print(f"BMP280 Pressure: {pressure:.2f} hPa")
