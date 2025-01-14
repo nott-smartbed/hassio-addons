@@ -134,8 +134,8 @@ class SensorManager:
                     altitude = self.utils.calculate_altitude(pressure)
                     print(f"BMP180 pressure sensor: {pressure} {Constants.PRESSURE_UNIT}")
                     print(f"BMP180 altitude sensor: {altitude} {Constants.ALTITUDE_UNIT}")
-                    self.post_to_home_assistant(Constants.BMP180_PRESSURE_SENSOR_NAME, round(pressure / 100, 2), Constants.PRESSURE_UNIT, Constants.BMP180_PRESSURE_FIENDLY_NAME, Constants.BMP180, Constants.PRESSURE)
-                    self.post_to_home_assistant(Constants.BMP180_ALTITUDE_SENSOR_NAME, round(altitude, 2), Constants.ALTITUDE_UNIT, Constants.BMP180_ALTITUDE_FIENDLY_NAME, Constants.BMP180, Constants.ALTITUDE)
+                    self.post_to_home_assistant(Constants.BMP180_PRESSURE_SENSOR_NAME, round(pressure / 100, 2), Constants.PRESSURE_UNIT, Constants.BMP180_PRESSURE_FRIENDLY_NAME, Constants.BMP180, Constants.PRESSURE)
+                    self.post_to_home_assistant(Constants.BMP180_ALTITUDE_SENSOR_NAME, round(altitude, 2), Constants.ALTITUDE_UNIT, Constants.BMP180_ALTITUDE_FRIENDLY_NAME, Constants.BMP180, Constants.ALTITUDE)
                 except Exception as e:
                     print(f"Error reading BMP180: {e}")
 
@@ -147,9 +147,9 @@ class SensorManager:
                     print(f"BMP280 temperature sensor: {temperature} {Constants.TEMPERATURE_UNIT}")
                     print(f"BMP280 pressure sensor: {pressure} {Constants.PRESSURE_UNIT}")
                     print(f"BMP280 altitude sensor: {altitude} {Constants.ALTITUDE_UNIT}")
-                    self.post_to_home_assistant(Constants.BMP280_TEMPERATURE_SENSOR_NAME, round(temperature, 2), Constants.TEMPERATURE_UNIT, Constants.BMP280_TEMPERATURE_FIENDLY_NAME, Constants.BMP280, Constants.TEMPERATURE)
-                    self.post_to_home_assistant(Constants.BMP280_PRESSURE_SENSOR_NAME, round(pressure, 2), Constants.PRESSURE_UNIT, Constants.BMP280_PRESSURE_FIENDLY_NAME, Constants.BMP280, Constants.PRESSURE)
-                    self.post_to_home_assistant(Constants.BMP280_ALTITUDE_SENSOR_NAME, round(altitude, 2), Constants.ALTITUDE_UNIT, Constants.BMP280_ALTITUDE_FIENDLY_NAME, Constants.BMP280, Constants.ALTITUDE)
+                    self.post_to_home_assistant(Constants.BMP280_TEMPERATURE_SENSOR_NAME, round(temperature, 2), Constants.TEMPERATURE_UNIT, Constants.BMP280_TEMPERATURE_FRIENDLY_NAME, Constants.BMP280, Constants.TEMPERATURE)
+                    self.post_to_home_assistant(Constants.BMP280_PRESSURE_SENSOR_NAME, round(pressure, 2), Constants.PRESSURE_UNIT, Constants.BMP280_PRESSURE_FRIENDLY_NAME, Constants.BMP280, Constants.PRESSURE)
+                    self.post_to_home_assistant(Constants.BMP280_ALTITUDE_SENSOR_NAME, round(altitude, 2), Constants.ALTITUDE_UNIT, Constants.BMP280_ALTITUDE_FRIENDLY_NAME, Constants.BMP280, Constants.ALTITUDE)
                 except Exception as e:
                     print(f"Error reading BMP280: {e}")
 
@@ -161,10 +161,10 @@ class SensorManager:
                         dew_point = self.utils.calculate_dew_point(temperature, humidity)
                         print(f"SHT31 absolute humidity: {absolute_humidity} {Constants.ABSOLUTE_HUMIDITY_UNIT}")
                         print(f"SHT31 dew point : {dew_point} {Constants.TEMPERATURE_UNIT}")
-                        self.post_to_home_assistant(Constants.SHT31_TEMPERATURE_SENSOR_NAME, round(temperature, 2), Constants.TEMPERATURE_UNIT, Constants.SHT31_TEMPERATURE_FIENDLY_NAME, Constants.SHT31, Constants.TEMPERATURE)
-                        self.post_to_home_assistant(Constants.SHT31_HUMIDITY_SENSOR_NAME, round(humidity, 2), Constants.HUMIDITY_UNIT, Constants.SHT31_ABSOLUTE_HUMIDITY_FIENDLY_NAME, Constants.SHT31, Constants.HUMIDITY)
-                        self.post_to_home_assistant(Constants.SHT31_ABSOLUTE_HUMIDITY_SENSOR_NAME, round(absolute_humidity, 2), Constants.ABSOLUTE_HUMIDITY_UNIT, Constants.SHT31_ABSOLUTE_HUMIDITY_FIENDLY_NAME, Constants.SHT31, Constants.ABSOLUTE_HUMIDITY)
-                        self.post_to_home_assistant(Constants.SHT31_DEW_POINT_SENSOR_NAME, round(dew_point, 2), Constants.TEMPERATURE_UNIT, Constants.SHT31_DEW_POINT_FIENDLY_NAME, Constants.SHT31, Constants.DEW_POINT)
+                        self.post_to_home_assistant(Constants.SHT31_TEMPERATURE_SENSOR_NAME, round(temperature, 2), Constants.TEMPERATURE_UNIT, Constants.SHT31_TEMPERATURE_FRIENDLY_NAME, Constants.SHT31, Constants.TEMPERATURE)
+                        self.post_to_home_assistant(Constants.SHT31_HUMIDITY_SENSOR_NAME, round(humidity, 2), Constants.HUMIDITY_UNIT, Constants.SHT31_ABSOLUTE_HUMIDITY_FRIENDLY_NAME, Constants.SHT31, Constants.HUMIDITY)
+                        self.post_to_home_assistant(Constants.SHT31_ABSOLUTE_HUMIDITY_SENSOR_NAME, round(absolute_humidity, 2), Constants.ABSOLUTE_HUMIDITY_UNIT, Constants.SHT31_ABSOLUTE_HUMIDITY_FRIENDLY_NAME, Constants.SHT31, Constants.ABSOLUTE_HUMIDITY)
+                        self.post_to_home_assistant(Constants.SHT31_DEW_POINT_SENSOR_NAME, round(dew_point, 2), Constants.TEMPERATURE_UNIT, Constants.SHT31_DEW_POINT_FRIENDLY_NAME, Constants.SHT31, Constants.DEW_POINT)
                 except Exception as e:
                     print(f"Error reading SHT31: {e}")
 
@@ -176,10 +176,10 @@ class SensorManager:
                         dew_point = self.utils.calculate_dew_point(temperature, humidity)
                         print(f"SHT45 absolute humidity: {absolute_humidity} {Constants.ABSOLUTE_HUMIDITY_UNIT}")
                         print(f"SHT45 dew point : {dew_point} {Constants.TEMPERATURE_UNIT}")
-                        self.post_to_home_assistant(Constants.SHT45_TEMPERATURE_SENSOR_NAME, round(temperature, 2), Constants.TEMPERATURE_UNIT, Constants.SHT45_TEMPERATURE_FIENDLY_NAME, Constants.SHT45, Constants.TEMPERATURE)
-                        self.post_to_home_assistant(Constants.SHT45_HUMIDITY_SENSOR_NAME, round(humidity, 2), Constants.HUMIDITY_UNIT, Constants.SHT45_ABSOLUTE_HUMIDITY_FIENDLY_NAME, Constants.SHT45, Constants.ABSOLUTE_HUMIDITY)
-                        self.post_to_home_assistant(Constants.SHT45_ABSOLUTE_HUMIDITY_SENSOR_NAME, round(absolute_humidity, 2), Constants.ABSOLUTE_HUMIDITY_UNIT, Constants.SHT45_ABSOLUTE_HUMIDITY_FIENDLY_NAME, Constants.SHT45, Constants.ABSOLUTE_HUMIDITY)
-                        self.post_to_home_assistant(Constants.SHT45_DEW_POINT_SENSOR_NAME, round(dew_point, 2), Constants.TEMPERATURE_UNIT, Constants.SHT45_DEW_POINT_FIENDLY_NAME, Constants.SHT45, Constants.DEW_POINT)
+                        self.post_to_home_assistant(Constants.SHT45_TEMPERATURE_SENSOR_NAME, round(temperature, 2), Constants.TEMPERATURE_UNIT, Constants.SHT45_TEMPERATURE_FRIENDLY_NAME, Constants.SHT45, Constants.TEMPERATURE)
+                        self.post_to_home_assistant(Constants.SHT45_HUMIDITY_SENSOR_NAME, round(humidity, 2), Constants.HUMIDITY_UNIT, Constants.SHT45_ABSOLUTE_HUMIDITY_FRIENDLY_NAME, Constants.SHT45, Constants.ABSOLUTE_HUMIDITY)
+                        self.post_to_home_assistant(Constants.SHT45_ABSOLUTE_HUMIDITY_SENSOR_NAME, round(absolute_humidity, 2), Constants.ABSOLUTE_HUMIDITY_UNIT, Constants.SHT45_ABSOLUTE_HUMIDITY_FRIENDLY_NAME, Constants.SHT45, Constants.ABSOLUTE_HUMIDITY)
+                        self.post_to_home_assistant(Constants.SHT45_DEW_POINT_SENSOR_NAME, round(dew_point, 2), Constants.TEMPERATURE_UNIT, Constants.SHT45_DEW_POINT_FRIENDLY_NAME, Constants.SHT45, Constants.DEW_POINT)
                 except Exception as e:
                     print(f"Error reading SHT45: {e}")
 
