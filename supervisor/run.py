@@ -43,7 +43,7 @@ class SensorManager:
         if self.options.get(Constants.BMP280, False):
             self.bmp280 = BMP280(i2c_addr=Constants.DEFAULT_BMP280_SENSOR_ADDRESS, i2c_dev=Constants.DEFAULT_BUS)
             self.bmp280.setup(
-                mode='normal',
+                mode=Constants.NORMAL,
                 temperature_oversampling=16,
                 pressure_oversampling=16,
                 temperature_standby=500
