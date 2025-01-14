@@ -13,7 +13,7 @@ from library.utils import Utils
 
 class SensorManager:
     def __init__(self, options_path="/data/options.json"):
-        self.options = self.load_options()
+        self.options = self.load_options(options_path)
         self.ha_base_url = "http://supervisor/core/api"
         self.ha_token = os.getenv("SUPERVISOR_TOKEN")
         self.utils = Utils()
