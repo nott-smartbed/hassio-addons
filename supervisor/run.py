@@ -37,7 +37,7 @@ class SensorManager:
             )
 
         if self.options.get(Constants.OXYGEN, False):
-            self.oxygen_sensor = DFRobot_Oxygen_IIC(Constants.DEFAULT_BUS, Constants.DEFAULT_OXYGEN_SENSOR_ADDRESS)
+            self.oxygen_sensor = DFRobot_Oxygen_IIC(self.bus, Constants.DEFAULT_OXYGEN_SENSOR_ADDRESS)
 
         if self.options.get(Constants.SHT31, False):
             self.sht31_address = Constants.DEFAULT_SHT31_SENSOR_ADDRESS
