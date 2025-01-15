@@ -116,7 +116,7 @@ class SensorManager:
             sensor_state = next((obj for obj in self.sensor_states if sensor_name in obj['entity_id']), None)
             if sensor_state is not None:
                 return sensor_state['state']
-            return 1
+        return 1
             
 
     def run(self):
