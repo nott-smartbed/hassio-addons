@@ -111,8 +111,6 @@ class SensorManager:
             print(f"Error reading Oxygen sensor: {e}")
             return None
     def find_sensor_state(self, sensor_name):
-        logging_sensor = next((obj for obj in self.sensor_states if sensor_name in obj['entity_id']), None)
-        print('[LOGGING_SENSOR]',logging_sensor)
         if self.sensor_states is not None:
             sensor_current_state = next((obj for obj in self.sensor_states if sensor_name in obj['entity_id']), None)
             # print("[SENSOR_CURRENT_STATE]", sensor_current_state)
