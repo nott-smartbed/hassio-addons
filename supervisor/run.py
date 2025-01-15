@@ -126,7 +126,7 @@ class SensorManager:
             if response is not None:
                 filtered_sensor = list(filter(lambda obj: obj['entity_id'].startswith("sensor."), response))
                 # print('[FILTERD_SENSOR]',filtered_sensor)
-                self.result = filtered_sensor
+                self.sensor_states = filtered_sensor
             if self.options.get(Constants.BMP180, False):
                 try:
                     pressure = self.bmp180.read_pressure()
