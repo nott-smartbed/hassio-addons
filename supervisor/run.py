@@ -118,7 +118,6 @@ class SensorManager:
     def run(self):
         while True:
             response = self.utils.get_states(self.ha_base_url, self.headers)
-            print(response)
             if response is not None:
                 self.result = list(filter(lambda obj: obj['entity_id'].startswith("sensor."), response))
             if self.options.get(Constants.BMP180, False):
