@@ -18,7 +18,6 @@ class SensorManager:
         self.ha_token = os.getenv("SUPERVISOR_TOKEN")
         self.utils = Utils()
         self.sensor_states = None
-        # self.validate_config()
         self.headers = {
             "Authorization": f"Bearer {self.ha_token}",
             "Content-Type": "application/json",
@@ -56,11 +55,6 @@ class SensorManager:
         except (FileNotFoundError, json.JSONDecodeError) as e:
             print(f"Error loading options: {e}")
             return {}
-
-    def validate_config(self):
-        if not self.ha_token:
-            print("Error: Supervisor token is missing.")
-            exit(1)
 
     def post_to_home_assistant(self, sensor_name, value, unit, friendly_name, code_name, data_type, state):
         url = f"{self.ha_base_url}/states/sensor.{sensor_name}"
@@ -113,19 +107,15 @@ class SensorManager:
     def find_sensor_state(self, sensor_name):
         if self.sensor_states is not None:
             sensor_current_state = next((obj for obj in self.sensor_states if sensor_name in obj['entity_id']), None)
-            print('[SENSOR_CURRENT_STATE]', sensor_current_state)
             if sensor_current_state is not None:
                 return sensor_current_state['state']
-        print('[SELF_SENSOR_STATES_IS_NULL]')
         return 1
             
-
     def run(self):
         while True:
             response = self.utils.get_states(self.ha_base_url, self.headers)
             if response is not None:
                 filtered_sensor = list(filter(lambda obj: obj['entity_id'].startswith("sensor."), response))
-                # print('[FILTERD_SENSOR]',filtered_sensor)
                 self.sensor_states = filtered_sensor
             if self.options.get(Constants.BMP180, False):
                 try:
@@ -215,6 +205,8 @@ class SensorManager:
                         self.post_to_home_assistant(Constants.OXYGEN_SENSOR_NAME, round(oxygen_concentration, 2), Constants.OXYGEN_CONCENTRATION_UNIT, Constants.OXYGEN_FRIENDLY_NAME, Constants.OXYGEN, Constants.OXYGEN_CONCENTRATION, oxygen_sensor_state)
                 except Exception as e:
                     print(f"Error reading Oxygen sensor: {e}")
+            
+            # interval
             time.sleep(10)
 
 if __name__ == "__main__":
