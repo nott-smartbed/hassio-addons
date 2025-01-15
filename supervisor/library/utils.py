@@ -1,5 +1,7 @@
+import requests
 import library.constants as Constants
 import math
+import json
 
 class Utils:
     def calculate_altitude(self, pressure):
@@ -28,3 +30,11 @@ class Utils:
             humidity = (100 * humidity_raw / 65535.0)
             return temperature, humidity
     
+    def get_states(self, url, headers):        
+        try:
+            response = requests.get(url, headers=headers)
+            response.raise_for_status()  # Raises an exception for HTTP error codes
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            print(f"Error fetching data from Home Assistant: {e}")
+             

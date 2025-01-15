@@ -11,7 +11,6 @@ from library.SHT4x import SHT4x
 import library.constants as Constants
 from library.utils import Utils
 
-
 class SensorManager:
     def __init__(self, options_path="/data/options.json"):
         self.options = self.load_options(options_path)
@@ -62,10 +61,10 @@ class SensorManager:
             print("Error: Supervisor token is missing.")
             exit(1)
 
-    def post_to_home_assistant(self, sensor_name, value, unit, friendly_name, code_name, data_type):
+    def post_to_home_assistant(self, sensor_name, value, unit, friendly_name, code_name, data_type, state):
         url = f"{self.ha_base_url}/states/sensor.{sensor_name}"
         payload = {
-            "state": 1,
+            "state": state,
             "attributes": {
                 "data_type": data_type,
                 "sensor_code_name": code_name,
@@ -74,7 +73,6 @@ class SensorManager:
                 "friendly_name": friendly_name,
             },
         }
-        print(payload)
         try:
             response = requests.post(url, json=payload, headers=self.headers)
             response.raise_for_status()
@@ -112,17 +110,24 @@ class SensorManager:
         except Exception as e:
             print(f"Error reading Oxygen sensor: {e}")
             return None
+    def find_sensor_state(self, state_list, sensor_name):
+        sensor_state = next((obj for obj in state_list if sensor_name in obj['entity_id']), None)
+        return sensor_state['state']
 
     def run(self):
         while True:
+            response = self.utils.get_states(self.ha_base_url, self.headers)
+            result = list(filter(lambda obj: obj['entity_id'].startswith("sensor."), response))
             if self.options.get(Constants.BMP180, False):
                 try:
                     pressure = self.bmp180.read_pressure()
                     altitude = self.utils.calculate_altitude(pressure)
-                    print(f"BMP180 pressure sensor: {pressure} {Constants.PRESSURE_UNIT}")
-                    print(f"BMP180 altitude sensor: {altitude} {Constants.ALTITUDE_UNIT}")
-                    self.post_to_home_assistant(Constants.BMP180_PRESSURE_SENSOR_NAME, round(pressure / 100, 2), Constants.PRESSURE_UNIT, Constants.BMP180_PRESSURE_FRIENDLY_NAME, Constants.BMP180, Constants.PRESSURE)
-                    self.post_to_home_assistant(Constants.BMP180_ALTITUDE_SENSOR_NAME, round(altitude, 2), Constants.ALTITUDE_UNIT, Constants.BMP180_ALTITUDE_FRIENDLY_NAME, Constants.BMP180, Constants.ALTITUDE)
+                    pressure_sensor_state = self.find_sensor_state(result, Constants.BMP180_PRESSURE_SENSOR_NAME)
+                    altitude_sensor_state = self.find_sensor_state(result, Constants.BMP180_ALTITUDE_SENSOR_NAME)
+                    print(f"BMP180 pressure sensor: {pressure} {Constants.PRESSURE_UNIT}, state: {pressure_sensor_state}")
+                    print(f"BMP180 altitude sensor: {altitude} {Constants.ALTITUDE_UNIT}, state: {altitude_sensor_state}")
+                    self.post_to_home_assistant(Constants.BMP180_PRESSURE_SENSOR_NAME, round(pressure / 100, 2), Constants.PRESSURE_UNIT, Constants.BMP180_PRESSURE_FRIENDLY_NAME, Constants.BMP180, Constants.PRESSURE, pressure_sensor_state)
+                    self.post_to_home_assistant(Constants.BMP180_ALTITUDE_SENSOR_NAME, round(altitude, 2), Constants.ALTITUDE_UNIT, Constants.BMP180_ALTITUDE_FRIENDLY_NAME, Constants.BMP180, Constants.ALTITUDE, altitude_sensor_state)
                 except Exception as e:
                     print(f"Error reading BMP180: {e}")
 
@@ -131,12 +136,16 @@ class SensorManager:
                     temperature = self.bmp280.get_temperature()
                     pressure = self.bmp280.get_pressure()
                     altitude = self.utils.calculate_altitude(pressure)
-                    print(f"BMP280 temperature sensor: {temperature} {Constants.TEMPERATURE_UNIT}")
-                    print(f"BMP280 pressure sensor: {pressure} {Constants.PRESSURE_UNIT}")
-                    print(f"BMP280 altitude sensor: {altitude} {Constants.ALTITUDE_UNIT}")
-                    self.post_to_home_assistant(Constants.BMP280_TEMPERATURE_SENSOR_NAME, round(temperature, 2), Constants.TEMPERATURE_UNIT, Constants.BMP280_TEMPERATURE_FRIENDLY_NAME, Constants.BMP280, Constants.TEMPERATURE)
-                    self.post_to_home_assistant(Constants.BMP280_PRESSURE_SENSOR_NAME, round(pressure, 2), Constants.PRESSURE_UNIT, Constants.BMP280_PRESSURE_FRIENDLY_NAME, Constants.BMP280, Constants.PRESSURE)
-                    self.post_to_home_assistant(Constants.BMP280_ALTITUDE_SENSOR_NAME, round(altitude, 2), Constants.ALTITUDE_UNIT, Constants.BMP280_ALTITUDE_FRIENDLY_NAME, Constants.BMP280, Constants.ALTITUDE)
+                    if temperature is not None and pressure is not None and altitude is not None:
+                        temperature_sensor_state = self.find_sensor_state(result, Constants.BMP280_TEMPERATURE_SENSOR_NAME)
+                        pressure_sensor_state = self.find_sensor_state(result, Constants.BMP280_PRESSURE_SENSOR_NAME)
+                        altitude_sensor_state = self.find_sensor_state(result, Constants.BMP280_ALTITUDE_SENSOR_NAME)
+                        print(f"BMP280 temperature sensor: {temperature} {Constants.TEMPERATURE_UNIT}, state: {temperature_sensor_state}")
+                        print(f"BMP280 pressure sensor: {pressure} {Constants.PRESSURE_UNIT}, state: {pressure_sensor_state}")
+                        print(f"BMP280 altitude sensor: {altitude} {Constants.ALTITUDE_UNIT}, state: {altitude_sensor_state}")
+                        self.post_to_home_assistant(Constants.BMP280_TEMPERATURE_SENSOR_NAME, round(temperature, 2), Constants.TEMPERATURE_UNIT, Constants.BMP280_TEMPERATURE_FRIENDLY_NAME, Constants.BMP280, Constants.TEMPERATURE, temperature_sensor_state)
+                        self.post_to_home_assistant(Constants.BMP280_PRESSURE_SENSOR_NAME, round(pressure, 2), Constants.PRESSURE_UNIT, Constants.BMP280_PRESSURE_FRIENDLY_NAME, Constants.BMP280, Constants.PRESSURE, pressure_sensor_state)
+                        self.post_to_home_assistant(Constants.BMP280_ALTITUDE_SENSOR_NAME, round(altitude, 2), Constants.ALTITUDE_UNIT, Constants.BMP280_ALTITUDE_FRIENDLY_NAME, Constants.BMP280, Constants.ALTITUDE, altitude_sensor_state)
                 except Exception as e:
                     print(f"Error reading BMP280: {e}")
 
@@ -144,14 +153,23 @@ class SensorManager:
                 try:
                     temperature, humidity = self.read_sht31()
                     if temperature is not None and humidity is not None:
+                        # calcualte absolute humidity and dew point
                         absolute_humidity = self.utils.calculate_absolute_humidity(temperature, humidity)
                         dew_point = self.utils.calculate_dew_point(temperature, humidity)
-                        print(f"SHT31 absolute humidity: {absolute_humidity} {Constants.ABSOLUTE_HUMIDITY_UNIT}")
-                        print(f"SHT31 dew point : {dew_point} {Constants.TEMPERATURE_UNIT}")
-                        self.post_to_home_assistant(Constants.SHT31_TEMPERATURE_SENSOR_NAME, round(temperature, 2), Constants.TEMPERATURE_UNIT, Constants.SHT31_TEMPERATURE_FRIENDLY_NAME, Constants.SHT31, Constants.TEMPERATURE)
-                        self.post_to_home_assistant(Constants.SHT31_HUMIDITY_SENSOR_NAME, round(humidity, 2), Constants.HUMIDITY_UNIT, Constants.SHT31_ABSOLUTE_HUMIDITY_FRIENDLY_NAME, Constants.SHT31, Constants.HUMIDITY)
-                        self.post_to_home_assistant(Constants.SHT31_ABSOLUTE_HUMIDITY_SENSOR_NAME, round(absolute_humidity, 2), Constants.ABSOLUTE_HUMIDITY_UNIT, Constants.SHT31_ABSOLUTE_HUMIDITY_FRIENDLY_NAME, Constants.SHT31, Constants.ABSOLUTE_HUMIDITY)
-                        self.post_to_home_assistant(Constants.SHT31_DEW_POINT_SENSOR_NAME, round(dew_point, 2), Constants.TEMPERATURE_UNIT, Constants.SHT31_DEW_POINT_FRIENDLY_NAME, Constants.SHT31, Constants.DEW_POINT)
+                        # get states
+                        temperature_sensor_state = self.find_sensor_state(result, Constants.SHT31_TEMPERATURE_SENSOR_NAME)
+                        humidity_sensor_state = self.find_sensor_state(result, Constants.SHT31_HUMIDITY_SENSOR_NAME)
+                        absolute_humidity_sensor_state = self.find_sensor_state(result, Constants.SHT31_ABSOLUTE_HUMIDITY_SENSOR_NAME)
+                        dew_point_sensor_state = self.find_sensor_state(result, Constants.SHT31_DEW_POINT_SENSOR_NAME)
+                        # push data
+                        print(f"SHT31 absolute humidity: {absolute_humidity} {Constants.ABSOLUTE_HUMIDITY_UNIT}, state: {absolute_humidity_sensor_state}")
+                        print(f"SHT31 dew point : {dew_point} {Constants.TEMPERATURE_UNIT}, state: {dew_point_sensor_state}")
+                        print(f"SHT31 temperature: {temperature} {Constants.TEMPERATURE_UNIT}, state: {temperature_sensor_state}")
+                        print(f"SHT31 humidity : {humidity} {Constants.HUMIDITY_UNIT}, state: {humidity_sensor_state}")
+                        self.post_to_home_assistant(Constants.SHT31_TEMPERATURE_SENSOR_NAME, round(temperature, 2), Constants.TEMPERATURE_UNIT, Constants.SHT31_TEMPERATURE_FRIENDLY_NAME, Constants.SHT31, Constants.TEMPERATURE, temperature_sensor_state)
+                        self.post_to_home_assistant(Constants.SHT31_HUMIDITY_SENSOR_NAME, round(humidity, 2), Constants.HUMIDITY_UNIT, Constants.SHT45_HUMIDITY_FRIENDLY_NAME, Constants.SHT31, Constants.HUMIDITY, humidity_sensor_state)
+                        self.post_to_home_assistant(Constants.SHT31_ABSOLUTE_HUMIDITY_SENSOR_NAME, round(absolute_humidity, 2), Constants.ABSOLUTE_HUMIDITY_UNIT, Constants.SHT31_ABSOLUTE_HUMIDITY_FRIENDLY_NAME, Constants.SHT31, Constants.ABSOLUTE_HUMIDITY, absolute_humidity_sensor_state)
+                        self.post_to_home_assistant(Constants.SHT31_DEW_POINT_SENSOR_NAME, round(dew_point, 2), Constants.TEMPERATURE_UNIT, Constants.SHT31_DEW_POINT_FRIENDLY_NAME, Constants.SHT31, Constants.DEW_POINT, dew_point_sensor_state)
                 except Exception as e:
                     print(f"Error reading SHT31: {e}")
 
@@ -159,14 +177,23 @@ class SensorManager:
                 try:
                     temperature, humidity = self.read_sht45()
                     if temperature is not None and humidity is not None:
+                        # calcualte absolute humidity and dew point
                         absolute_humidity = self.utils.calculate_absolute_humidity(temperature, humidity)
                         dew_point = self.utils.calculate_dew_point(temperature, humidity)
-                        print(f"SHT45 absolute humidity: {absolute_humidity} {Constants.ABSOLUTE_HUMIDITY_UNIT}")
-                        print(f"SHT45 dew point : {dew_point} {Constants.TEMPERATURE_UNIT}")
-                        self.post_to_home_assistant(Constants.SHT45_TEMPERATURE_SENSOR_NAME, round(temperature, 2), Constants.TEMPERATURE_UNIT, Constants.SHT45_TEMPERATURE_FRIENDLY_NAME, Constants.SHT45, Constants.TEMPERATURE)
-                        self.post_to_home_assistant(Constants.SHT45_HUMIDITY_SENSOR_NAME, round(humidity, 2), Constants.HUMIDITY_UNIT, Constants.SHT45_ABSOLUTE_HUMIDITY_FRIENDLY_NAME, Constants.SHT45, Constants.ABSOLUTE_HUMIDITY)
-                        self.post_to_home_assistant(Constants.SHT45_ABSOLUTE_HUMIDITY_SENSOR_NAME, round(absolute_humidity, 2), Constants.ABSOLUTE_HUMIDITY_UNIT, Constants.SHT45_ABSOLUTE_HUMIDITY_FRIENDLY_NAME, Constants.SHT45, Constants.ABSOLUTE_HUMIDITY)
-                        self.post_to_home_assistant(Constants.SHT45_DEW_POINT_SENSOR_NAME, round(dew_point, 2), Constants.TEMPERATURE_UNIT, Constants.SHT45_DEW_POINT_FRIENDLY_NAME, Constants.SHT45, Constants.DEW_POINT)
+                        #get states
+                        temperature_sensor_state = self.find_sensor_state(result, Constants.SHT45_TEMPERATURE_SENSOR_NAME)
+                        humidity_sensor_state = self.find_sensor_state(result, Constants.SHT45_HUMIDITY_SENSOR_NAME)
+                        absolute_humidity_sensor_state = self.find_sensor_state(result, Constants.SHT45_ABSOLUTE_HUMIDITY_SENSOR_NAME)
+                        dew_point_sensor_state = self.find_sensor_state(result, Constants.SHT45_DEW_POINT_SENSOR_NAME)
+                        # push data
+                        print(f"SHT45 absolute humidity: {absolute_humidity} {Constants.ABSOLUTE_HUMIDITY_UNIT}, state: {absolute_humidity_sensor_state}")
+                        print(f"SHT45 dew point : {dew_point} {Constants.TEMPERATURE_UNIT}, state: {dew_point_sensor_state}")
+                        print(f"SHT45 temperature: {temperature} {Constants.TEMPERATURE_UNIT}, state: {temperature_sensor_state}")
+                        print(f"SHT45 humidity : {humidity} {Constants.HUMIDITY_UNIT}, state: {humidity_sensor_state}")
+                        self.post_to_home_assistant(Constants.SHT45_TEMPERATURE_SENSOR_NAME, round(temperature, 2), Constants.TEMPERATURE_UNIT, Constants.SHT45_TEMPERATURE_FRIENDLY_NAME, Constants.SHT45, Constants.TEMPERATURE, temperature_sensor_state)
+                        self.post_to_home_assistant(Constants.SHT45_HUMIDITY_SENSOR_NAME, round(humidity, 2), Constants.HUMIDITY_UNIT, Constants.SHT45_HUMIDITY_FRIENDLY_NAME, Constants.SHT45, Constants.HUMIDITY, humidity_sensor_state)
+                        self.post_to_home_assistant(Constants.SHT45_ABSOLUTE_HUMIDITY_SENSOR_NAME, round(absolute_humidity, 2), Constants.ABSOLUTE_HUMIDITY_UNIT, Constants.SHT45_ABSOLUTE_HUMIDITY_FRIENDLY_NAME, Constants.SHT45, Constants.ABSOLUTE_HUMIDITY, absolute_humidity_sensor_state)
+                        self.post_to_home_assistant(Constants.SHT45_DEW_POINT_SENSOR_NAME, round(dew_point, 2), Constants.TEMPERATURE_UNIT, Constants.SHT45_DEW_POINT_FRIENDLY_NAME, Constants.SHT45, Constants.DEW_POINT, dew_point_sensor_state)
                 except Exception as e:
                     print(f"Error reading SHT45: {e}")
 
@@ -174,11 +201,12 @@ class SensorManager:
                 try:
                     oxygen_concentration = self.read_oxygen()
                     if oxygen_concentration is not None:
-                        self.post_to_home_assistant(Constants.OXYGEN_SENSOR_NAME, round(oxygen_concentration, 2), Constants.OXYGEN_CONCENTRATION_UNIT, Constants.OXYGEN_FRIENDLY_NAME, Constants.OXYGEN, Constants.OXYGEN_CONCENTRATION)
+                        oxygen_sensor_state = self.find_sensor_state(result, Constants.OXYGEN_SENSOR_NAME)
+                        print(f"Oxygen concentration : {oxygen_concentration} {Constants.OXYGEN_CONCENTRATION_UNIT}, state: {oxygen_sensor_state}")
+                        self.post_to_home_assistant(Constants.OXYGEN_SENSOR_NAME, round(oxygen_concentration, 2), Constants.OXYGEN_CONCENTRATION_UNIT, Constants.OXYGEN_FRIENDLY_NAME, Constants.OXYGEN, Constants.OXYGEN_CONCENTRATION, oxygen_sensor_state)
                 except Exception as e:
                     print(f"Error reading Oxygen sensor: {e}")
             time.sleep(10)
-
 
 if __name__ == "__main__":
     sensor_manager = SensorManager()
