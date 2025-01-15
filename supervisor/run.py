@@ -117,7 +117,10 @@ class SensorManager:
     def run(self):
         while True:
             response = self.utils.get_states(self.ha_base_url, self.headers)
-            result = list(filter(lambda obj: obj['entity_id'].startswith("sensor."), response))
+            print(response)
+            result
+            if response is not None:
+                result = list(filter(lambda obj: obj['entity_id'].startswith("sensor."), response))
             if self.options.get(Constants.BMP180, False):
                 try:
                     pressure = self.bmp180.read_pressure()
