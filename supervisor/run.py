@@ -76,6 +76,7 @@ class SensorManager:
         }
         try:
             response = requests.post(url, json=payload, headers=self.headers)
+            print(response.json())
             response.raise_for_status()
             print(f"Data posted to {sensor_name}: {value}{unit}")
         except requests.exceptions.RequestException as e:
