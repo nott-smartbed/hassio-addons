@@ -1,5 +1,5 @@
 name: supervisor_sensor
-version: dev-1.2.5
+version: dev-1.2.6
 slug: supervisor_sensor
 description: "This add on using supervisor privilege"
 arch:
@@ -20,7 +20,6 @@ options:
   sht45: false
   oxygen: false
 schema:
-  core_base_url: str
   bmp180: bool
   bmp280: bool
   sht31: bool

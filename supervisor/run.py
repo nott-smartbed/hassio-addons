@@ -14,8 +14,7 @@ from library.utils import Utils
 class SensorManager:
     def __init__(self, options_path="/data/options.json"):
         self.options = self.load_options(options_path)
-        self.su_base_url = "http://supervisor/core/api"
-        self.core_base_url = self.options.get(Constants.CORE_BASE_URL)
+        self.ha_base_url = "http://supervisor/core/api"
         self.ha_token = os.getenv("SUPERVISOR_TOKEN")
         self.utils = Utils()
         self.sensor_states = None
@@ -64,7 +63,7 @@ class SensorManager:
             exit(1)
 
     def post_to_home_assistant(self, sensor_name, value, unit, friendly_name, code_name, data_type, state):
-        url = f"{self.su_base_url}/states/sensor.{sensor_name}"
+        url = f"{self.ha_base_url}/states/sensor.{sensor_name}"
         payload = {
             "state": state,
             "attributes": {
@@ -118,7 +117,7 @@ class SensorManager:
 
     def run(self):
         while True:
-            response = self.utils.get_states(self.core_base_url, self.headers)
+            response = self.utils.get_states(self.ha_base_url, self.headers)
             print(response)
             if response is not None:
                 self.result = list(filter(lambda obj: obj['entity_id'].startswith("sensor."), response))
