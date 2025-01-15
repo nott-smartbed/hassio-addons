@@ -111,9 +111,11 @@ class SensorManager:
             print(f"Error reading Oxygen sensor: {e}")
             return None
     def find_sensor_state(self, sensor_name):
+        logging_sensor = next((obj for obj in self.sensor_states if sensor_name in obj['entity_id']), None)
+        print('[LOGGING_SENSOR]',logging_sensor)
         if self.sensor_states is not None:
             sensor_current_state = next((obj for obj in self.sensor_states if sensor_name in obj['entity_id']), None)
-            print("[SENSOR_CURRENT_STATE]", sensor_current_state)
+            # print("[SENSOR_CURRENT_STATE]", sensor_current_state)
             if sensor_current_state is not None:
                 return sensor_current_state['state']
         return 1
@@ -124,7 +126,7 @@ class SensorManager:
             response = self.utils.get_states(self.ha_base_url, self.headers)
             if response is not None:
                 filtered_sensor = list(filter(lambda obj: obj['entity_id'].startswith("sensor."), response))
-                print('[FILTERD_SENSOR]',filtered_sensor)
+                # print('[FILTERD_SENSOR]',filtered_sensor)
                 self.result = filtered_sensor
             if self.options.get(Constants.BMP180, False):
                 try:

@@ -1,5 +1,5 @@
 name: supervisor_sensor
-version: dev-1.2.16
+version: dev-1.2.17
 slug: supervisor_sensor
 description: "This add on using supervisor privilege"
 arch:
