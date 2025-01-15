@@ -124,7 +124,7 @@ class SensorManager:
             response = self.utils.get_states(self.ha_base_url, self.headers)
             if response is not None:
                 filtered_sensor = list(filter(lambda obj: obj['entity_id'].startswith("sensor."), response))
-                print(filtered_sensor)
+                print('[FILTERD_SENSOR]',filtered_sensor)
                 self.result = filtered_sensor
             if self.options.get(Constants.BMP180, False):
                 try:
