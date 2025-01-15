@@ -32,7 +32,8 @@ class Utils:
     
     def get_states(self, url, headers):        
         try:
-            response = requests.get(url, headers=headers)
+            print(headers)
+            response = requests.get('http://192.168.31.18:8123/api/states', headers=headers)
             response.raise_for_status()  # Raises an exception for HTTP error codes
             return response.json()
         except requests.exceptions.RequestException as e:
