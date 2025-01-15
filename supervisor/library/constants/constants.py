@@ -8,6 +8,7 @@ SHT31 = 'sht31'
 SHT45 = 'sht45'
 ADDR_OXY = 'addr_oxy'
 ADDR_SHT = 'addr-sht'
+CORE_BASE_URL = 'core_base_url'
 
 # DEFAULT
 DEFAULT_BASE_URL = 'http://default-url'
