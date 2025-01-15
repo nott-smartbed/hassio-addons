@@ -76,7 +76,6 @@ class SensorManager:
         }
         try:
             response = requests.post(url, json=payload, headers=self.headers)
-            print(response.json())
             response.raise_for_status()
             print(f"Data posted to {sensor_name}: {value}{unit}")
         except requests.exceptions.RequestException as e:
@@ -112,11 +111,11 @@ class SensorManager:
             print(f"Error reading Oxygen sensor: {e}")
             return None
     def find_sensor_state(self, sensor_name):
-        print(self.sensor_states, sensor_name)
         if self.sensor_states is not None:
-            sensor_state = next((obj for obj in self.sensor_states if sensor_name in obj['entity_id']), None)
-            if sensor_state is not None:
-                return sensor_state['state']
+            sensor_current_state = next((obj for obj in self.sensor_states if sensor_name in obj['entity_id']), None)
+            print("[SENSOR_CURRENT_STATE]", sensor_current_state)
+            if sensor_current_state is not None:
+                return sensor_current_state['state']
         return 1
             
 
