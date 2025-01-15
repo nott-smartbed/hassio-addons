@@ -113,9 +113,10 @@ class SensorManager:
     def find_sensor_state(self, sensor_name):
         if self.sensor_states is not None:
             sensor_current_state = next((obj for obj in self.sensor_states if sensor_name in obj['entity_id']), None)
-            # print("[SENSOR_CURRENT_STATE]", sensor_current_state)
+            print('[SENSOR_CURRENT_STATE]', sensor_current_state)
             if sensor_current_state is not None:
                 return sensor_current_state['state']
+        print('[SELF_SENSOR_STATES_IS_NULL]')
         return 1
             
 
