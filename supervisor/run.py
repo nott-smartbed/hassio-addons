@@ -83,7 +83,6 @@ class SensorManager:
 
     def read_sht31(self):
         try:
-            print(self.sht31_address, self.read_temp_hum_cmd, self.read_temp_hum_cmd[1:])
             self.bus.write_i2c_block_data(self.sht31_address, self.read_temp_hum_cmd[0], self.read_temp_hum_cmd[1:])
             time.sleep(0.5)
             data = self.bus.read_i2c_block_data(self.sht31_address, 0x00, 6)
@@ -113,7 +112,10 @@ class SensorManager:
             return None
     def find_sensor_state(self, sensor_name):
         sensor_state = next((obj for obj in self.sensor_states if sensor_name in obj['entity_id']), None)
-        return sensor_state['state']
+        if sensor_state is not None:
+            return sensor_state['state']
+        return 1
+            
 
     def run(self):
         while True:

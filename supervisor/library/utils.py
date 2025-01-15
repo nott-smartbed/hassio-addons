@@ -32,7 +32,6 @@ class Utils:
     
     def get_states(self, url, headers):        
         try:
-            print(headers)
             response = requests.get(f'{url}/states', headers=headers)
             response.raise_for_status()  # Raises an exception for HTTP error codes
             return response.json()
