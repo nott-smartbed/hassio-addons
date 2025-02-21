@@ -1,0 +1,11 @@
+ultralytics==8.3.72
+opencv-python==4.11.0.86
+tensorflow==2.18.0
+keras==3.8.0
+numpy==2.0.2
+librosa==0.10.2
+matplotlib==3.9.4
+cryptography==44.0.1
+pvrecorder==1.2.5
+fastapi==0.115.8
+uvicorn==0.34.0

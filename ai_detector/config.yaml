@@ -1,0 +1,17 @@
+---
+name: "AI Detectors"
+version: "1.0"
+slug: "ai-detectors"
+description: "AI Detectors for snoring and sleeping pose"
+startup: "application"
+boot: "auto"
+arch:
+  - armhf
+  - armv7
+  - aarch64
+  - amd64
+  - i386
+options:
+  SECRET_KEY: required
+schema:
+  SECRET_KEY: str
