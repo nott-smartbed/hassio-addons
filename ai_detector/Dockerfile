@@ -12,4 +12,4 @@ COPY requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
 # Entrypoint to start the addon
-CMD [ "uvicorn", "app.server:app", "--workers 1", "--port 8001" ]
+CMD [ "uvicorn", "app.server:app --workers 1 --port 8001" ]
