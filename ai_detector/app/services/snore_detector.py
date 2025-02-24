@@ -8,6 +8,7 @@ from cryptography.fernet import Fernet
 import os
 import tempfile
 from pvrecorder import PvRecorder
+import sounddevice as sd
 import time
 
 SAMPLE_RATE = 16000  # Sample rate
@@ -122,3 +123,61 @@ class SnoreDetector:
             recorder.delete()
             print("Recorder deleted.")
     
+    def predict_snoring_realtime_using_sd(self):
+        """Predicts snoring in real-time using the CNN model with sounddevice."""
+        devices = sd.query_devices()
+        device_index = None
+        
+        # Find the correct device index
+        for i, device in enumerate(devices):
+            print(f"[{i}] {device['name']}")
+            if "Usb Audio Device" in device["name"]:
+                device_index = i
+                break
+        
+        if device_index is None:
+            return "Usb Audio Device not found"
+
+        audio_buffer = []
+
+        def callback(indata, frames, time, status):
+            """Callback function for real-time audio processing."""
+            if status:
+                print(status, flush=True)
+            frame = np.array(indata[:, 0], dtype=np.float32)  # Mono channel
+            frame = frame / np.max(np.abs(frame))  # Normalize
+            audio_buffer.extend(frame.tolist())
+
+        try:
+            print("🎤 Listening...")
+            start_time = time.time()
+
+            with sd.InputStream(
+                samplerate=SAMPLE_RATE, 
+                channels=1, 
+                dtype=np.float32, 
+                callback=callback, 
+                device=device_index
+            ):
+                while time.time() - start_time < 5:
+                    time.sleep(0.1)  # Small delay to let buffer accumulate
+
+                    if len(audio_buffer) >= SAMPLE_RATE * DURATION:
+                        # === Convert to Mel Spectrogram ===
+                        audio_chunk = np.array(audio_buffer[:SAMPLE_RATE * DURATION])  # Take latest 1s
+                        audio_buffer = audio_buffer[FRAME_LENGTH:]  # Shift buffer
+
+                        mel_spectrogram = librosa.feature.melspectrogram(
+                            y=audio_chunk, sr=SAMPLE_RATE, n_fft=1024, hop_length=HOP_LENGTH, n_mels=N_MELS
+                        )
+                        mel_spec = librosa.power_to_db(mel_spectrogram, ref=np.max)
+                        mel_spec = mel_spec.reshape(1, mel_spec.shape[0], mel_spec.shape[1], 1)  # CNN input shape
+
+                        prediction = self.model.predict(mel_spec)
+                        if prediction[0] > 0.7:
+                            print(f"Snoring detected! {prediction[0]}")
+
+        except KeyboardInterrupt:
+            print("Recording stopped.")
+        except Exception as e:
+            print(e)

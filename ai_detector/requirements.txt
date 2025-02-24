@@ -9,3 +9,4 @@ cryptography==44.0.1
 pvrecorder==1.2.5
 fastapi==0.115.8
 uvicorn==0.34.0
+sounddevice==0.5.1

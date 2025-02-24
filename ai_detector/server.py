@@ -25,7 +25,7 @@ def get_status():
 def predict_snoring():
     detector = SnoreDetector()
     detector.load_model()
-    prediction = detector.predict_snoring_realtime()
+    prediction = detector.predict_snoring_realtime_using_sd()
     return prediction
 
 
