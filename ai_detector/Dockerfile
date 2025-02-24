@@ -7,9 +7,11 @@ WORKDIR /app
 # Copy the addon files into the container
 COPY app/ /app/
 COPY requirements.txt /app/requirements.txt
+COPY server.py server.py
+RUN chmod +x server.py
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
 # Entrypoint to start the addon
-CMD [ "uvicorn", "app.server:app", "--port", "8001" ]
+CMD [ "uvicorn", "server:app", "--port", "8001" ]

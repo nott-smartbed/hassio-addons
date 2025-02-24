@@ -90,7 +90,7 @@ class SnoreDetector:
                 device_index = i
                 break
         if device_index is None:
-            raise ValueError("Usb Audio Device not found")
+            return "Usb Audio Device not found"
         recorder = PvRecorder(device_index=device_index, frame_length=FRAME_LENGTH)
         try:
             audio_buffer = []
