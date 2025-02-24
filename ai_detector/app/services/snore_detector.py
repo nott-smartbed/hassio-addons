@@ -104,15 +104,14 @@ class SnoreDetector:
                     # === Convert to Mel Spectrogram ===
                     audio_chunk = np.array(audio_buffer[:SAMPLE_RATE * DURATION])  # Take the latest 1s of audio
                     audio_buffer = audio_buffer[FRAME_LENGTH:]  # Shift buffer to keep real-time data
-
                     mel_spectrogram = librosa.feature.melspectrogram(
                         y=audio_chunk, sr=SAMPLE_RATE, n_fft=1024, hop_length=HOP_LENGTH, n_mels=N_MELS
                     )
                     mel_spec = librosa.power_to_db(mel_spectrogram, ref=np.max)  # Convert to dB
                     mel_spec = mel_spec.reshape(1, mel_spec.shape[0], mel_spec.shape[1], 1)  # Reshape for CNN
                     prediction = self.model.predict(mel_spec)
-                    if prediction[0] > 0.8:
-                        print("Snoring detected!")
+                    if prediction[0] > 0.7:
+                        print(f"Snoring detected! {prediction[0]}")
             recorder.stop()
         except KeyboardInterrupt:
             recorder.stop()

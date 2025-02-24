@@ -11,8 +11,5 @@ COPY requirements.txt /app/requirements.txt
 # Install Python dependencies
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
-# Set permissions for the app directory
-RUN chmod +x /app/main.py
-
 # Entrypoint to start the addon
-CMD [ "uvicorn", "" ]
+CMD [ "uvicorn", "app.server:app", "--workers 1", "--port 8001" ]
