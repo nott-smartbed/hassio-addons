@@ -2,6 +2,7 @@ from fastapi import FastAPI
 import logging
 import sys
 from app.services.snore_detector import SnoreDetector
+from app.services.pose_detector import PoseDetector
 
 app = FastAPI()
 
@@ -39,4 +40,14 @@ def predict_snoring_test():
 
 @app.get('/pose-detector/predict')
 def predict_pose():
-    return {"prediction": "Sitting"}
+    detector = PoseDetector()
+    boxes = detector.detect_pose_from_camera()
+    return {"boxes": boxes}
+
+
+@app.get('/pose-detector/predict-test')
+def predict_pose_test():
+    detector = PoseDetector()
+    boxes = detector.detect_pose_with_test_data()
+    return {"boxes": boxes}
+
