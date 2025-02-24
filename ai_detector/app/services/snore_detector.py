@@ -127,12 +127,12 @@ class SnoreDetector:
         """Predicts snoring in real-time using the CNN model with sounddevice."""
         print("Getting available devices...")
         try:
-            devices = sd.query_devices()
+            devices = sd.query_devices(kind="input")
         except Exception as e:
             print(e)
             return "Error getting devices"
+        print(f"Available devices: {len(devices)}")
         device_index = None
-        
         # Find the correct device index
         for i, device in enumerate(devices):
             print(f"[{i}] {device['name']}")
