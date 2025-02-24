@@ -1,6 +1,6 @@
 ---
 name: "AI Detectors"
-version: "1.0.4"
+version: "1.0.5"
 slug: "ai_detectors"
 description: "AI Detectors for snoring and sleeping pose"
 startup: "application"
