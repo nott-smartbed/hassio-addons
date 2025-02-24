@@ -125,7 +125,12 @@ class SnoreDetector:
     
     def predict_snoring_realtime_using_sd(self):
         """Predicts snoring in real-time using the CNN model with sounddevice."""
-        devices = sd.query_devices()
+        print("Getting available devices...")
+        try:
+            devices = sd.query_devices()
+        except Exception as e:
+            print(e)
+            return "Error getting devices"
         device_index = None
         
         # Find the correct device index
