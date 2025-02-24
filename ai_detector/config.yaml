@@ -1,6 +1,6 @@
 ---
 name: "AI Detectors"
-version: "1.0.6.5"
+version: "1.0.6.6"
 slug: "ai_detectors"
 description: "AI Detectors for snoring and sleeping pose"
 startup: "application"
@@ -25,4 +25,6 @@ privileged:
   - DAC_READ_SEARCH
 devices:
   - "/dev/snd:/dev/snd:rwm"  # Grant access to ALSA audio devices
+  - "/dev/video0:/dev/video0:rwm" # Grant access to video devices
 audio: true  # Enable audio support
+video: true  # Enable video support

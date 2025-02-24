@@ -6,6 +6,9 @@ RUN apt update && apt install -y \
     libasound2-dev \
     libportaudio2 \
     libportaudiocpp0 \
+    ffmpeg \
+    libsm6 \
+    libxext6 \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy the addon files into the container
