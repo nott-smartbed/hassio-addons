@@ -1,0 +1,1 @@
+uvicorn app.server:app --workers 1 --port 8002

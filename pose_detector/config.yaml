@@ -1,0 +1,26 @@
+---
+name: "Pose Detector"
+version: "1.0.0.1"
+slug: "pose_detector"
+description: "AI Detector for sleeping pose"
+startup: "application"
+boot: "auto"
+arch:
+  - armhf
+  - armv7
+  - aarch64
+  - amd64
+  - i386
+options:
+  SECRET_KEY: required
+  HA_TOKEN: required
+schema:
+  SECRET_KEY: str
+  HA_TOKEN: str
+network:
+  8002/tcp: 8002
+homeassistant_api: true
+host_network: true
+devices:
+  - "/dev/video0:/dev/video0:rwm" # Grant access to video devices
+video: true  # Enable video support
