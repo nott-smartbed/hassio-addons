@@ -1,6 +1,6 @@
 ---
 name: "AI Detectors"
-version: "1.0.6.6"
+version: "1.0.6.7"
 slug: "ai_detectors"
 description: "AI Detectors for snoring and sleeping pose"
 startup: "application"
@@ -13,11 +13,12 @@ arch:
   - i386
 options:
   SECRET_KEY: required
+  HA_TOKEN: required
 schema:
   SECRET_KEY: str
 network:
   8001/tcp: 8001
-
+homeassistant_api: true
 host_network: true
 privileged: 
   - SYS_ADMIN
