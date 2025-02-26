@@ -1,6 +1,12 @@
 # Base image compatible with Python 3.9 and Home Assistant addons
 FROM python:3.10-slim
 
+RUN apt update && apt install -y \
+    ffmpeg \
+    libsm6 \
+    libxext6 \
+    && rm -rf /var/lib/apt/lists/*
+
 # Copy the addon files into the container
 COPY app/ /app/
 COPY requirements.txt /requirements.txt
