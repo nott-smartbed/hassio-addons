@@ -26,7 +26,6 @@ def get_status():
 def predict_pose():
     detector = PoseDetector()
     started_at = int(time.time())
-    detector.update_ha_entity(entity_data)
     results = detector.detect_pose_from_camera()
     if results is None:
         return JSONResponse(status_code=500, content={"error": "No camera detected."})
