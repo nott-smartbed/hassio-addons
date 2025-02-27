@@ -14,7 +14,7 @@ COPY server.py /server.py
 RUN chmod +x /server.py
 
 # Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install -r requirements.txt
 
 # Entrypoint to start the addon
 CMD [ "uvicorn", "server:app", "--port", "8002" ]
