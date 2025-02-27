@@ -2,9 +2,11 @@ from ultralytics import YOLO
 import cv2
 import os
 import time
+from .homeassistant import update_entity
 
 DEFAULT_FILENAME = os.getcwd() + "/app/camera/capture.jpg"
 POSE_FILENAME = os.getcwd() + "/app/camera/pose.jpg"
+POSE_ENTITY_ID = "sensor.pose_detector"
 
 class PoseDetector():
     _instance = None
@@ -82,3 +84,8 @@ class PoseDetector():
         except Exception as e:
             print(e)
             return None
+        
+    def update_ha_entity(self, data_payload):
+        update_entity(POSE_ENTITY_ID, data_payload)
+        print(f"Entity {POSE_ENTITY_ID} updated.")
+        return True
