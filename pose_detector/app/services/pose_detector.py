@@ -6,6 +6,7 @@ from .homeassistant import update_entity
 
 DEFAULT_FILENAME = os.getcwd() + "/app/camera/capture.jpg"
 POSE_FILENAME = os.getcwd() + "/app/camera/pose.jpg"
+MEDIA_POSE_FILENAME = '/media/camera/pose.jpg'
 POSE_ENTITY_ID = "sensor.pose_detector"
 
 class PoseDetector():
@@ -60,6 +61,7 @@ class PoseDetector():
     
     def save_pose_image(self, results):
         results[0].save(filename=POSE_FILENAME)
+        results[0].save(filename=MEDIA_POSE_FILENAME)
         print(f"Pose Image saved ")
 
 
@@ -86,6 +88,9 @@ class PoseDetector():
             return None
         
     def update_ha_entity(self, data_payload):
-        update_entity(POSE_ENTITY_ID, data_payload)
+        response = update_entity(POSE_ENTITY_ID, data_payload)
+        if not response:
+            print(f"Error updating entity {POSE_ENTITY_ID}.")
+            return False
         print(f"Entity {POSE_ENTITY_ID} updated.")
         return True
