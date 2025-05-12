@@ -65,6 +65,10 @@ class PoseDetector():
         print(f"Pose Image saved ")
 
 
+    def get_pose_keypoints(self, results):
+        return results[0].keypoints.xyn.cpu().numpy().tolist()
+
+
     def get_pose_image(self):
         return POSE_FILENAME
 
@@ -80,6 +84,16 @@ class PoseDetector():
                 return None
             self.capture_image(camera_index, DEFAULT_FILENAME)
             results = model(DEFAULT_FILENAME)
+            keypoints = self.get_pose_keypoints(results)
+            data_payload = {
+                "state": "on",
+                "attributes": {
+                    "keypoints": keypoints
+                }
+            }
+            if not self.update_ha_entity(data_payload):
+                print("Error updating Home Assistant entity.")
+                return None
             self.save_pose_image(results)
             os.remove(DEFAULT_FILENAME)
             return results
